@@ -1,0 +1,500 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>五維財富動力學｜個人資源盤點</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: "Noto Sans TC", sans-serif;
+    }
+
+    body {
+      background: linear-gradient(135deg, #f8fbff 0%, #eef7ff 100%);
+      color: #1e293b;
+      padding: 32px;
+    }
+
+    .container {
+      max-width: 1400px;
+      margin: auto;
+    }
+
+    .hero {
+      background: white;
+      border-radius: 28px;
+      padding: 40px;
+      box-shadow: 0 20px 60px rgba(0,0,0,.08);
+      margin-bottom: 28px;
+      position: sticky;
+      top: 20px;
+      z-index: 10;
+    }
+
+    h1 {
+      font-size: 2.5rem;
+      margin-bottom: 12px;
+      background: linear-gradient(90deg,#2563eb,#06b6d4);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .subtitle {
+      color: #64748b;
+      line-height: 1.8;
+      margin-bottom: 24px;
+    }
+
+    .top-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit,minmax(220px,1fr));
+      gap: 16px;
+      margin-bottom: 24px;
+    }
+
+    .score-card {
+      background: linear-gradient(135deg,#ffffff,#f1f7ff);
+      border: 1px solid #dbeafe;
+      border-radius: 20px;
+      padding: 20px;
+    }
+
+    .score-title {
+      color: #64748b;
+      margin-bottom: 10px;
+      font-size: .95rem;
+    }
+
+    .score-value {
+      font-size: 2rem;
+      font-weight: 800;
+      color: #2563eb;
+    }
+
+    .section {
+      background: white;
+      border-radius: 28px;
+      padding: 32px;
+      margin-bottom: 24px;
+      box-shadow: 0 10px 40px rgba(0,0,0,.05);
+    }
+
+    .section h2 {
+      margin-bottom: 24px;
+      color: #0f172a;
+    }
+
+    .question {
+      padding: 18px;
+      border-radius: 18px;
+      border: 1px solid #e2e8f0;
+      margin-bottom: 16px;
+      transition: .2s ease;
+      background: #fff;
+    }
+
+    .question:hover {
+      border-color: #93c5fd;
+      transform: translateY(-2px);
+    }
+
+    .question p {
+      line-height: 1.8;
+      margin-bottom: 12px;
+      font-weight: 500;
+    }
+
+    select {
+      width: 100%;
+      padding: 12px;
+      border-radius: 12px;
+      border: 1px solid #cbd5e1;
+      font-size: 1rem;
+      background: #f8fafc;
+    }
+
+    .btn {
+      border: none;
+      padding: 16px 28px;
+      border-radius: 18px;
+      background: linear-gradient(90deg,#2563eb,#06b6d4);
+      color: white;
+      font-size: 1rem;
+      cursor: pointer;
+      font-weight: 700;
+      box-shadow: 0 10px 30px rgba(37,99,235,.25);
+    }
+
+    .report {
+      display: none;
+      margin-top: 40px;
+    }
+
+    .report-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 16px;
+      margin-bottom: 32px;
+    }
+
+    .report-card {
+      background: linear-gradient(135deg,#ffffff,#f8fbff);
+      border: 1px solid #dbeafe;
+      border-radius: 24px;
+      padding: 28px;
+      margin-bottom: 20px;
+    }
+
+    .report-card h3 {
+      margin-bottom: 16px;
+      color: #1d4ed8;
+    }
+
+    .status {
+      display: inline-block;
+      margin-top: 12px;
+      padding: 8px 14px;
+      border-radius: 999px;
+      background: #dbeafe;
+      color: #1d4ed8;
+      font-weight: 700;
+    }
+
+    ul {
+      padding-left: 20px;
+      line-height: 2;
+      color: #334155;
+    }
+
+    canvas {
+      max-width: 600px;
+      margin: 30px auto;
+    }
+
+    .footer-note {
+      margin-top: 40px;
+      text-align: center;
+      color: #64748b;
+      line-height: 1.8;
+    }
+
+    @media(max-width:768px){
+      body{padding:16px;}
+      .hero,.section{padding:24px;}
+      h1{font-size:2rem;}
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+
+    <div class="hero">
+      <h1>五維財富動力學</h1>
+      <p class="subtitle">
+        個人資源盤點系統｜使用者可直接填寫分數，自動生成第二工作頁的個人分析報告。
+        採用明亮現代化 UI/UX 設計，適合內部顧問、個人成長、教練諮詢與工作坊使用。
+      </p>
+
+      <div class="top-grid">
+        <div class="score-card">
+          <div class="score-title">金錢 MONEY</div>
+          <div class="score-value" id="moneyScore">0.0</div>
+        </div>
+
+        <div class="score-card">
+          <div class="score-title">精力 ENERGY</div>
+          <div class="score-value" id="energyScore">0.0</div>
+        </div>
+
+        <div class="score-card">
+          <div class="score-title">時間 TIME</div>
+          <div class="score-value" id="timeScore">0.0</div>
+        </div>
+
+        <div class="score-card">
+          <div class="score-title">人脈 CONNECTIONS</div>
+          <div class="score-value" id="connectionScore">0.0</div>
+        </div>
+
+        <div class="score-card">
+          <div class="score-title">能力 CAPABILITY</div>
+          <div class="score-value" id="abilityScore">0.0</div>
+        </div>
+      </div>
+
+      <button class="btn" onclick="generateReport()">生成個人分析報告</button>
+    </div>
+
+    <div id="questionContainer"></div>
+
+    <div class="report" id="reportSection">
+      <div class="section">
+        <div class="report-header">
+          <div>
+            <h2>個人深度分析報告</h2>
+            <p id="overallText"></p>
+          </div>
+        </div>
+
+        <canvas id="radarChart"></canvas>
+
+        <div id="reportCards"></div>
+      </div>
+    </div>
+
+    <div class="footer-note">
+      五維財富動力學 © 2026 ｜ Bright UI Edition
+    </div>
+  </div>
+
+  <script>
+    const dimensions = {
+      money: {
+        title: '金錢 MONEY',
+        description: '財務安全、資產增值與金流管理能力',
+        questions: [
+          '我每個月固定將收入的20%以上，在花費之前就先撥入儲蓄或投資帳戶',
+          '如果明天失去工作，現有流動資金可以維持正常生活超過12個月',
+          '我清楚知道自己每個月固定支出的總金額',
+          '我有獨立的緊急備用金',
+          '面對重大消費前，我會評估長期回報'
+        ]
+      },
+
+      energy: {
+        title: '精力 ENERGY',
+        description: '體能、情緒與恢復能力',
+        questions: [
+          '我每天起床後通常感到有精神',
+          '我能長時間保持專注與清晰思考',
+          '我能快速從壓力與挫折中恢復',
+          '我有穩定運動與休息習慣',
+          '我清楚知道自己努力的方向與意義'
+        ]
+      },
+
+      time: {
+        title: '時間 TIME',
+        description: '時間主權、深度工作與優先順序管理',
+        questions: [
+          '我可以自主安排大部分時間',
+          '我每天有固定的深度工作時間',
+          '我願意授權低價值工作',
+          '我能專注真正重要的事情',
+          '我對時間流失有高度意識'
+        ]
+      },
+
+      connections: {
+        title: '人脈 CONNECTIONS',
+        description: '人際資本、合作資源與網絡效益',
+        questions: [
+          '我身邊有值得長期合作的人',
+          '我的人脈圈具有多樣性',
+          '我會主動維護重要關係',
+          '我經常為他人創造價值',
+          '我能透過人脈獲得新機會'
+        ]
+      },
+
+      ability: {
+        title: '能力 CAPABILITY',
+        description: '專業能力、學習成長與差異化優勢',
+        questions: [
+          '我持續學習新技能',
+          '我擁有可量化的專業能力',
+          '我能快速適應新環境',
+          '我有清楚的差異化優勢',
+          '我對未來3年能力成長有計畫'
+        ]
+      }
+    };
+
+    const questionContainer = document.getElementById('questionContainer');
+
+    Object.keys(dimensions).forEach(key => {
+      const section = document.createElement('div');
+      section.className = 'section';
+
+      section.innerHTML = `
+        <h2>${dimensions[key].title}</h2>
+        <p style="color:#64748b;margin-bottom:24px;">${dimensions[key].description}</p>
+      `;
+
+      dimensions[key].questions.forEach((q,index) => {
+        const question = document.createElement('div');
+        question.className = 'question';
+
+        question.innerHTML = `
+          <p>${index + 1}. ${q}</p>
+          <select data-dimension="${key}">
+            <option value="">請選擇評分</option>
+            <option value="1">1｜幾乎從不</option>
+            <option value="2">2｜偶爾</option>
+            <option value="3">3｜有時</option>
+            <option value="4">4｜經常</option>
+            <option value="5">5｜總是</option>
+          </select>
+        `;
+
+        section.appendChild(question);
+      });
+
+      questionContainer.appendChild(section);
+    });
+
+    function calculateDimension(key){
+      const selects = document.querySelectorAll(`select[data-dimension="${key}"]`);
+      let total = 0;
+      let count = 0;
+
+      selects.forEach(select => {
+        if(select.value !== ''){
+          total += Number(select.value);
+          count++;
+        }
+      });
+
+      if(count === 0) return 0;
+      return ((total / count) * 2).toFixed(1);
+    }
+
+    function getLevel(score){
+      if(score < 4.5) return '▼ 系統瓶頸';
+      if(score < 6.5) return '◆ 待提升';
+      if(score < 8.5) return '● 良好基礎';
+      return '★ 槓桿資產';
+    }
+
+    function getAdvice(key,score){
+      const adviceMap = {
+        money:[
+          '建立自動化儲蓄與投資系統',
+          '重新檢視固定支出與資產配置',
+          '優先建立現金流安全邊界'
+        ],
+        energy:[
+          '固定睡眠與運動節奏',
+          '降低高消耗社交與資訊噪音',
+          '建立恢復與休息儀式'
+        ],
+        time:[
+          '建立每日深度工作區塊',
+          '刪除低價值重複工作',
+          '提高授權與系統化比例'
+        ],
+        connections:[
+          '主動維護高品質人脈',
+          '增加跨領域交流',
+          '持續輸出價值建立信任'
+        ],
+        ability:[
+          '建立未來3年技能地圖',
+          '培養跨領域整合能力',
+          '強化可被市場辨識的優勢'
+        ]
+      };
+
+      return adviceMap[key];
+    }
+
+    let radarChart;
+
+    function generateReport(){
+      const scores = {
+        money: Number(calculateDimension('money')),
+        energy: Number(calculateDimension('energy')),
+        time: Number(calculateDimension('time')),
+        connections: Number(calculateDimension('connections')),
+        ability: Number(calculateDimension('ability')),
+      };
+
+      document.getElementById('moneyScore').innerText = scores.money;
+      document.getElementById('energyScore').innerText = scores.energy;
+      document.getElementById('timeScore').innerText = scores.time;
+      document.getElementById('connectionScore').innerText = scores.connections;
+      document.getElementById('abilityScore').innerText = scores.ability;
+
+      const overall = (
+        (scores.money + scores.energy + scores.time + scores.connections + scores.ability) / 5
+      ).toFixed(1);
+
+      document.getElementById('overallText').innerHTML = `
+        整體財富轉化效率：<strong>${overall} / 10</strong>
+      `;
+
+      const reportCards = document.getElementById('reportCards');
+      reportCards.innerHTML = '';
+
+      Object.keys(scores).forEach(key => {
+        const card = document.createElement('div');
+        card.className = 'report-card';
+
+        card.innerHTML = `
+          <h3>${dimensions[key].title}</h3>
+          <p><strong>得分：</strong>${scores[key]} / 10</p>
+          <div class="status">${getLevel(scores[key])}</div>
+
+          <div style="margin-top:20px;">
+            <h4 style="margin-bottom:12px;">優先行動建議</h4>
+            <ul>
+              ${getAdvice(key,scores[key]).map(item => `<li>${item}</li>`).join('')}
+            </ul>
+          </div>
+        `;
+
+        reportCards.appendChild(card);
+      });
+
+      document.getElementById('reportSection').style.display = 'block';
+
+      const ctx = document.getElementById('radarChart');
+
+      if(radarChart){
+        radarChart.destroy();
+      }
+
+      radarChart = new Chart(ctx, {
+        type: 'radar',
+        data: {
+          labels: ['金錢','精力','時間','人脈','能力'],
+          datasets: [{
+            label: '五維財富評分',
+            data: [
+              scores.money,
+              scores.energy,
+              scores.time,
+              scores.connections,
+              scores.ability
+            ],
+            fill: true
+          }]
+        },
+        options: {
+          responsive: true,
+          scales: {
+            r: {
+              min: 0,
+              max: 10,
+              ticks: {
+                stepSize: 2
+              }
+            }
+          }
+        }
+      });
+
+      window.scrollTo({
+        top: document.body.scrollHeight,
+        behavior: 'smooth'
+      });
+    }
+  </script>
+</body>
+</html>
