@@ -26,14 +26,14 @@
 
     .hero {
       background: white;
-      border-radius: 24px;
-      padding: 24px 28px;
-      box-shadow: 0 12px 40px rgba(0,0,0,.06);
-      margin-bottom: 20px;
+      border-radius: 20px;
+      padding: 18px 22px;
+      box-shadow: 0 8px 28px rgba(0,0,0,.05);
+      margin-bottom: 14px;
       position: sticky;
-      top: 12px;
+      top: 8px;
       z-index: 10;
-    }
+}
 
     h1 {
       font-size: 2.5rem;
@@ -51,17 +51,17 @@
 
     .top-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fit,minmax(160px,1fr));
-      gap: 12px;
-      margin-bottom: 18px;
-    }
+      grid-template-columns: repeat(auto-fit,minmax(140px,1fr));
+      gap: 10px;
+      margin-bottom: 14px;
+}
 
     .score-card {
       background: linear-gradient(135deg,#ffffff,#f1f7ff);
       border: 1px solid #dbeafe;
-      border-radius: 16px;
-      padding: 14px;
-    }
+      border-radius: 14px;
+      padding: 10px 12px;
+}
 
     .score-title {
       color: #64748b;
@@ -119,14 +119,14 @@
 
     .btn {
       border: none;
-      padding: 12px 20px;
-      border-radius: 14px;
+      padding: 10px 18px;
+      border-radius: 12px;
       background: linear-gradient(90deg,#2563eb,#06b6d4);
       color: white;
       font-size: 1rem;
       cursor: pointer;
       font-weight: 700;
-      box-shadow: 0 8px 24px rgba(37,99,235,.2);
+      box-shadow: 0 6px 18px rgba(37,99,235,.2);
     }
 
     .report {
@@ -560,9 +560,9 @@ const questionContainer = document.getElementById('questionContainer');
         }
       });
 
-      window.scrollTo({
-        top: document.body.scrollHeight,
-        behavior: 'smooth'
+      document.getElementById('radarChart').scrollIntoView({
+        behavior: 'smooth',
+        block: 'center'
       });
     }
   </script>
