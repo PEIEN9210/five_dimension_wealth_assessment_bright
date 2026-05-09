@@ -189,6 +189,60 @@
       .hero,.section{padding:24px;}
       h1{font-size:2rem;}
     }
+    
+    .mini-header{
+      position: fixed;
+      top: -100px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: calc(100% - 32px);
+      max-width: 1200px;
+
+      background: rgba(255,255,255,.88);
+      backdrop-filter: blur(14px);
+
+      border: 1px solid rgba(255,255,255,.5);
+
+      border-radius: 18px;
+
+      padding: 12px 18px;
+
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+
+      box-shadow: 0 10px 30px rgba(0,0,0,.08);
+
+      z-index: 999;
+
+      transition: all .35s ease;
+    }
+    
+    .mini-header.show{
+      top: 12px;
+    }
+
+    .mini-title{
+      font-size: 1rem;
+      font-weight: 800;
+      color: #0f172a;
+    }
+    .mini-score{
+      font-weight: 700;
+      color: #2563eb;
+    }
+    .mini-btn{
+      border:none;
+      padding:10px 16px;
+      border-radius:12px;
+
+      background: linear-gradient(90deg,#2563eb,#06b6d4);
+
+      color:white;
+      font-weight:700;
+      cursor:pointer;
+    }
+    
   </style>
 </head>
 <body>
@@ -241,7 +295,8 @@
       <button class="mini-btn" onclick="generateReport()">
         生成報告
       </button>
-      </div>
+    </div>
+    
     <div id="questionContainer"></div>
 
     <div class="report" id="reportSection">
@@ -507,6 +562,8 @@ const questionContainer = document.getElementById('questionContainer');
         (scores.money + scores.energy + scores.time + scores.connections + scores.ability) / 5
       ).toFixed(1);
 
+      document.getElementById('miniOverall').innerText = overall;
+
       document.getElementById('overallText').innerHTML = `
         整體財富轉化效率：<strong>${overall} / 10</strong>
       `;
@@ -577,6 +634,17 @@ const questionContainer = document.getElementById('questionContainer');
         block: 'center'
       });
     }
+    const miniHeader = document.getElementById('miniHeader');
+
+    window.addEventListener('scroll', () => {
+
+      if(window.scrollY > 280){
+        miniHeader.classList.add('show');
+      } else {
+        miniHeader.classList.remove('show');
+      }
+
+    });
   </script>
 </body>
 </html>
