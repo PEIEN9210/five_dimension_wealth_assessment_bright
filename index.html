@@ -1,804 +1,637 @@
 <!DOCTYPE html>
-<html lang="zh-Hant">
+<html lang="zh-TW">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>五維財富動力學｜個人資源盤點</title>
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-  <style>
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-      font-family: "Noto Sans TC", sans-serif;
-    }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>五維財富動力學 · 個人資源盤點</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@400;600;700&family=Noto+Sans+TC:wght@300;400;500;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --gold: #C9A84C;
+    --gold-light: #E8C97A;
+    --gold-pale: #FDF6E3;
+    --navy: #1A2744;
+    --navy-mid: #2B3F6B;
+    --teal: #2A7D6F;
+    --teal-light: #3AAFA0;
+    --coral: #E86B52;
+    --lavender: #7B6EA6;
+    --sky: #3B82C4;
+    --bg: #F8F6F0;
+    --white: #FFFFFF;
+    --text: #1C1C2E;
+    --text-light: #6B6B80;
+    --border: #E2D9C8;
+    --radius: 14px;
+    --shadow: 0 4px 24px rgba(26,39,68,0.10);
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Noto Sans TC', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; font-size: 15px; line-height: 1.7; }
 
-    body {
-      background: linear-gradient(135deg, #f8fbff 0%, #eef7ff 100%);
-      color: #1e293b;
-      padding: 32px;
-    }
+  /* HEADER */
+  .site-header { background: linear-gradient(135deg, var(--navy) 0%, var(--navy-mid) 60%, #3B5080 100%); color: white; padding: 48px 24px 40px; text-align: center; position: relative; overflow: hidden; }
+  .site-header::before { content: ''; position: absolute; inset: 0; background: radial-gradient(ellipse 80% 60% at 50% 120%, rgba(201,168,76,0.18) 0%, transparent 70%); }
+  .header-tag { display: inline-block; font-size: 11px; font-weight: 500; letter-spacing: 3px; text-transform: uppercase; color: var(--gold-light); border: 1px solid rgba(201,168,76,0.4); border-radius: 20px; padding: 5px 18px; margin-bottom: 20px; position: relative; }
+  .site-header h1 { font-family: 'Noto Serif TC', serif; font-size: clamp(26px, 5vw, 42px); font-weight: 700; letter-spacing: 2px; margin-bottom: 8px; position: relative; }
+  .header-sub { font-size: 14px; color: rgba(255,255,255,0.65); letter-spacing: 1px; position: relative; margin-bottom: 36px; }
+  .scoring-guide { background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.15); border-radius: 12px; padding: 16px 24px; display: inline-flex; flex-wrap: wrap; gap: 12px 24px; justify-content: center; position: relative; max-width: 680px; }
+  .score-item { display: flex; align-items: center; gap: 8px; font-size: 13px; color: rgba(255,255,255,0.85); }
+  .score-badge { width: 26px; height: 26px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 12px; }
 
-    .container {
-      max-width: 1400px;
-      margin: auto;
-    }
+  /* DASHBOARD */
+  .dashboard { background: white; border-bottom: 2px solid var(--border); padding: 20px; position: sticky; top: 0; z-index: 100; box-shadow: 0 2px 20px rgba(0,0,0,0.08); }
+  .dashboard-inner { max-width: 960px; margin: 0 auto; display: flex; align-items: center; justify-content: space-between; gap: 16px; flex-wrap: wrap; }
+  .dim-scores { display: flex; gap: 10px; flex-wrap: wrap; }
+  .dim-chip { display: flex; align-items: center; gap: 8px; background: var(--bg); border: 1.5px solid var(--border); border-radius: 30px; padding: 6px 14px; font-size: 13px; font-weight: 500; }
+  .dim-chip .dim-icon { width: 10px; height: 10px; border-radius: 50%; }
+  .dim-chip .score-val { font-weight: 700; font-size: 15px; color: var(--navy); }
+  .total-badge { background: linear-gradient(135deg, var(--navy), var(--navy-mid)); color: white; border-radius: 12px; padding: 10px 20px; text-align: center; flex-shrink: 0; }
+  .total-badge .label { font-size: 11px; opacity: 0.7; letter-spacing: 1px; }
+  .total-badge .value { font-size: 22px; font-weight: 700; font-family: 'Noto Serif TC', serif; }
 
-    .hero {
-      background: white;
-      border-radius: 20px;
-      padding: 18px 22px;
-      box-shadow: 0 8px 28px rgba(0,0,0,.05);
-      margin-bottom: 14px;
-      position: sticky;
-      top: 8px;
-      z-index: 10;
-}
+  /* MAIN */
+  .main { max-width: 960px; margin: 0 auto; padding: 40px 20px 120px; }
 
-    h1 {
-      font-size: 2.5rem;
-      margin-bottom: 12px;
-      background: linear-gradient(90deg,#2563eb,#06b6d4);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-    }
+  /* DIMENSION */
+  .dimension-section { margin-bottom: 48px; border-radius: var(--radius); overflow: hidden; box-shadow: var(--shadow); }
+  .dim-header { padding: 24px 28px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px; }
+  .dim-title-wrap { display: flex; align-items: center; gap: 14px; }
+  .dim-number { width: 44px; height: 44px; border-radius: 50%; background: rgba(255,255,255,0.25); display: flex; align-items: center; justify-content: center; font-family: 'Noto Serif TC', serif; font-size: 20px; font-weight: 700; color: white; flex-shrink: 0; }
+  .dim-name { font-family: 'Noto Serif TC', serif; font-size: 22px; font-weight: 700; color: white; }
+  .dim-en { font-size: 12px; color: rgba(255,255,255,0.6); letter-spacing: 2px; margin-top: 2px; }
+  .dim-score-display { background: rgba(255,255,255,0.15); border: 1.5px solid rgba(255,255,255,0.3); border-radius: 12px; padding: 10px 20px; text-align: center; color: white; min-width: 100px; }
+  .dim-score-display .s-label { font-size: 11px; opacity: 0.7; letter-spacing: 1px; }
+  .dim-score-display .s-val { font-size: 26px; font-weight: 700; font-family: 'Noto Serif TC', serif; }
+  .dim-score-display .s-max { font-size: 13px; opacity: 0.6; }
+  .dim-money .dim-header { background: linear-gradient(135deg, #B8860B, var(--gold)); }
+  .dim-energy .dim-header { background: linear-gradient(135deg, #1B6B5E, var(--teal-light)); }
+  .dim-time .dim-header { background: linear-gradient(135deg, #2563A8, var(--sky)); }
+  .dim-network .dim-header { background: linear-gradient(135deg, #5B4F8A, var(--lavender)); }
+  .dim-capability .dim-header { background: linear-gradient(135deg, #B54030, var(--coral)); }
 
-    .subtitle {
-      color: #64748b;
-      line-height: 1.8;
-      margin-bottom: 24px;
-    }
+  /* QUESTIONS */
+  .questions-wrap { background: white; }
+  .question-item { display: flex; align-items: center; gap: 16px; padding: 14px 28px; border-bottom: 1px solid #F0EDE6; transition: background 0.15s; }
+  .question-item:last-child { border-bottom: none; }
+  .question-item:hover { background: #FDFBF7; }
+  .q-num { font-size: 12px; font-weight: 700; color: var(--text-light); min-width: 36px; flex-shrink: 0; }
+  .q-text { flex: 1; font-size: 14px; line-height: 1.6; color: var(--text); }
+  .q-select { appearance: none; -webkit-appearance: none; background: var(--bg) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%236B6B80'/%3E%3C/svg%3E") no-repeat right 10px center; border: 1.5px solid var(--border); border-radius: 8px; padding: 8px 30px 8px 12px; font-size: 14px; font-family: 'Noto Sans TC', sans-serif; font-weight: 600; color: var(--text); cursor: pointer; min-width: 80px; transition: border-color 0.2s, box-shadow 0.2s; flex-shrink: 0; }
+  .q-select:focus { outline: none; border-color: var(--navy-mid); box-shadow: 0 0 0 3px rgba(43,63,107,0.12); }
+  .q-select.has-value { color: var(--navy); }
 
-    .top-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit,minmax(140px,1fr));
-      gap: 10px;
-      margin-bottom: 14px;
-}
+  /* PROGRESS */
+  .progress-bar-wrap { padding: 12px 28px; background: white; border-top: 1px solid #F0EDE6; }
+  .progress-label { font-size: 11px; color: var(--text-light); margin-bottom: 6px; letter-spacing: 0.5px; }
+  .progress-track { height: 6px; background: #EDE9DF; border-radius: 10px; overflow: hidden; }
+  .progress-fill { height: 100%; border-radius: 10px; transition: width 0.4s ease; }
+  .dim-money .progress-fill { background: linear-gradient(90deg, #B8860B, var(--gold-light)); }
+  .dim-energy .progress-fill { background: linear-gradient(90deg, #1B6B5E, var(--teal-light)); }
+  .dim-time .progress-fill { background: linear-gradient(90deg, #2563A8, var(--sky)); }
+  .dim-network .progress-fill { background: linear-gradient(90deg, #5B4F8A, var(--lavender)); }
+  .dim-capability .progress-fill { background: linear-gradient(90deg, #B54030, var(--coral)); }
 
-    .score-card {
-      background: linear-gradient(135deg,#ffffff,#f1f7ff);
-      border: 1px solid #dbeafe;
-      border-radius: 14px;
-      padding: 10px 12px;
-}
+  /* SUBTOTAL */
+  .dim-subtotal { background: var(--bg); padding: 16px 28px; display: flex; align-items: center; justify-content: space-between; border-top: 2px solid var(--border); }
+  .subtotal-label { font-size: 13px; color: var(--text-light); font-weight: 500; }
+  .subtotal-val { font-size: 18px; font-weight: 700; color: var(--navy); }
 
-    .score-title {
-      color: #64748b;
-      margin-bottom: 10px;
-      font-size: .95rem;
-    }
+  /* LEGEND */
+  .legend-wrap { background: white; border-radius: var(--radius); padding: 20px 28px; margin-bottom: 40px; box-shadow: var(--shadow); display: flex; gap: 20px; flex-wrap: wrap; align-items: center; justify-content: center; border: 1px solid var(--border); }
+  .legend-item { display: flex; align-items: center; gap: 8px; font-size: 13px; }
+  .legend-dot { width: 12px; height: 12px; border-radius: 50%; }
 
-    .score-value {
-      font-size: 2rem;
-      font-weight: 800;
-      color: #2563eb;
-    }
+  /* GENERATE BTN */
+  .gen-report-section { position: fixed; bottom: 0; left: 0; right: 0; background: white; border-top: 2px solid var(--border); padding: 16px 20px; z-index: 90; box-shadow: 0 -4px 20px rgba(0,0,0,0.08); }
+  .gen-report-inner { max-width: 960px; margin: 0 auto; display: flex; gap: 12px; align-items: center; flex-wrap: wrap; justify-content: space-between; }
+  .gen-info { font-size: 13px; color: var(--text-light); }
+  .btn-generate { background: linear-gradient(135deg, var(--navy), var(--navy-mid)); color: white; border: none; border-radius: 10px; padding: 14px 32px; font-size: 15px; font-weight: 700; font-family: 'Noto Sans TC', sans-serif; cursor: pointer; letter-spacing: 1px; transition: transform 0.15s, box-shadow 0.15s; display: flex; align-items: center; gap: 10px; }
+  .btn-generate:hover { transform: translateY(-2px); box-shadow: 0 6px 24px rgba(26,39,68,0.25); }
+  .btn-generate:active { transform: translateY(0); }
 
-    .section {
-      background: white;
-      border-radius: 28px;
-      padding: 32px;
-      margin-bottom: 24px;
-      box-shadow: 0 10px 40px rgba(0,0,0,.05);
-    }
+  /* MODAL */
+  .report-overlay { position: fixed; inset: 0; background: rgba(20,28,54,0.65); backdrop-filter: blur(6px); z-index: 200; display: none; align-items: flex-start; justify-content: center; padding: 20px; overflow-y: auto; }
+  .report-overlay.open { display: flex; }
+  .report-modal { background: var(--bg); border-radius: 20px; max-width: 800px; width: 100%; margin: auto; overflow: hidden; box-shadow: 0 20px 80px rgba(0,0,0,0.35); animation: slideUp 0.35s cubic-bezier(0.34,1.56,0.64,1); }
+  @keyframes slideUp { from { transform: translateY(40px) scale(0.97); opacity: 0; } to { transform: translateY(0) scale(1); opacity: 1; } }
+  .report-modal-header { background: linear-gradient(135deg, var(--navy), var(--navy-mid)); color: white; padding: 32px; position: relative; }
+  .report-modal-header h2 { font-family: 'Noto Serif TC', serif; font-size: 22px; margin-bottom: 6px; }
+  .report-modal-header .sub { font-size: 13px; opacity: 0.65; }
+  .report-close { position: absolute; top: 20px; right: 20px; background: rgba(255,255,255,0.15); border: none; color: white; width: 36px; height: 36px; border-radius: 50%; cursor: pointer; font-size: 18px; display: flex; align-items: center; justify-content: center; transition: background 0.2s; }
+  .report-close:hover { background: rgba(255,255,255,0.3); }
 
-    .section h2 {
-      margin-bottom: 24px;
-      color: #0f172a;
-    }
+  /* REPORT BODY */
+  .radar-section { padding: 28px; background: white; border-bottom: 1px solid var(--border); }
+  .radar-title { font-size: 13px; font-weight: 700; color: var(--text-light); letter-spacing: 1px; margin-bottom: 16px; text-align: center; }
+  .radar-wrap { display: flex; justify-content: center; }
+  .report-score-grid { padding: 24px 28px; background: white; border-bottom: 1px solid var(--border); display: grid; grid-template-columns: repeat(5, 1fr); gap: 12px; }
+  .score-card { border-radius: 12px; padding: 16px 10px; text-align: center; border: 2px solid transparent; }
+  .score-card .sc-icon { font-size: 20px; margin-bottom: 6px; }
+  .score-card .sc-name { font-size: 12px; font-weight: 600; margin-bottom: 8px; }
+  .score-card .sc-val { font-size: 26px; font-weight: 700; font-family: 'Noto Serif TC', serif; }
+  .score-card .sc-max { font-size: 11px; opacity: 0.5; }
+  .score-card .sc-level { font-size: 11px; margin-top: 6px; padding: 3px 8px; border-radius: 20px; display: inline-block; }
+  .sc-money { background: #FDF6E3; border-color: var(--gold); color: #8B6914; } .sc-money .sc-val { color: #B8860B; }
+  .sc-energy { background: #EAF7F5; border-color: var(--teal-light); color: #1B5A50; } .sc-energy .sc-val { color: var(--teal); }
+  .sc-time { background: #EBF3FB; border-color: var(--sky); color: #1A4D80; } .sc-time .sc-val { color: #2563A8; }
+  .sc-network { background: #F2EFF9; border-color: var(--lavender); color: #4A3F70; } .sc-network .sc-val { color: var(--lavender); }
+  .sc-capability { background: #FEF1EE; border-color: var(--coral); color: #8B3828; } .sc-capability .sc-val { color: var(--coral); }
+  .dim-analysis { padding: 0 28px 28px; }
+  .analysis-block { background: white; border-radius: 14px; margin-bottom: 20px; overflow: hidden; border: 1px solid var(--border); }
+  .analysis-block-header { padding: 16px 20px; display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
+  .ab-title { font-family: 'Noto Serif TC', serif; font-size: 16px; font-weight: 700; color: white; }
+  .ab-level { font-size: 12px; color: rgba(255,255,255,0.8); }
+  .ab-score { font-size: 22px; font-weight: 700; color: white; font-family: 'Noto Serif TC', serif; }
+  .ab-money { background: linear-gradient(135deg, #B8860B, var(--gold)); }
+  .ab-energy { background: linear-gradient(135deg, #1B6B5E, var(--teal-light)); }
+  .ab-time { background: linear-gradient(135deg, #2563A8, var(--sky)); }
+  .ab-network { background: linear-gradient(135deg, #5B4F8A, var(--lavender)); }
+  .ab-capability { background: linear-gradient(135deg, #B54030, var(--coral)); }
+  .analysis-body { padding: 20px; }
+  .analysis-text1 { font-size: 14px; line-height: 1.8; color: var(--text); margin-bottom: 10px; }
+  .analysis-text2 { font-size: 14px; line-height: 1.8; color: var(--text-light); margin-bottom: 14px; }
+  .analysis-insight { background: var(--gold-pale); border-left: 3px solid var(--gold); padding: 12px 16px; font-size: 13px; border-radius: 0 8px 8px 0; margin-bottom: 16px; color: var(--text); line-height: 1.7; }
+  .sub-dims { margin-bottom: 16px; }
+  .sub-dim-title { font-size: 12px; font-weight: 700; color: var(--text-light); letter-spacing: 1px; margin-bottom: 10px; }
+  .sub-dim-row { display: flex; align-items: center; gap: 12px; margin-bottom: 8px; }
+  .sub-dim-name { font-size: 13px; color: var(--text); min-width: 88px; flex-shrink: 0; }
+  .sub-track { flex: 1; height: 8px; background: #EDE9DF; border-radius: 10px; overflow: hidden; }
+  .sub-fill { height: 100%; border-radius: 10px; }
+  .sub-score { font-size: 12px; font-weight: 700; color: var(--navy); min-width: 40px; text-align: right; }
+  .actions-title { font-size: 12px; font-weight: 700; color: var(--text-light); letter-spacing: 1px; margin-bottom: 10px; }
+  .action-item { display: flex; gap: 10px; align-items: flex-start; padding: 10px 14px; border-radius: 8px; background: var(--bg); margin-bottom: 8px; font-size: 13px; line-height: 1.7; }
+  .action-num { width: 22px; height: 22px; background: var(--navy); color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 700; flex-shrink: 0; margin-top: 1px; }
+  .twelve-week { padding: 24px 28px; background: var(--bg); border-top: 1px solid var(--border); }
+  .tw-title { font-family: 'Noto Serif TC', serif; font-size: 18px; font-weight: 700; margin-bottom: 16px; color: var(--navy); }
+  .tw-phase { background: white; border-radius: 12px; padding: 16px 20px; display: flex; gap: 16px; align-items: flex-start; border: 1px solid var(--border); margin-bottom: 12px; }
+  .tw-phase-num { background: var(--navy); color: white; border-radius: 8px; padding: 6px 12px; font-size: 12px; font-weight: 700; white-space: nowrap; flex-shrink: 0; letter-spacing: 0.5px; }
+  .tw-phase-label { font-size: 13px; font-weight: 700; color: var(--navy); margin-bottom: 4px; }
+  .tw-phase-text { font-size: 13px; color: var(--text-light); line-height: 1.7; }
+  .tw-mantra { text-align: center; padding: 20px; font-style: italic; color: var(--text-light); font-size: 14px; border-top: 1px solid var(--border); margin-top: 4px; }
+  .report-footer { padding: 20px 28px; background: var(--navy); color: rgba(255,255,255,0.6); font-size: 12px; text-align: center; }
 
-    .question {
-      padding: 18px;
-      border-radius: 18px;
-      border: 1px solid #e2e8f0;
-      margin-bottom: 16px;
-      transition: .2s ease;
-      background: #fff;
-    }
-
-    .question:hover {
-      border-color: #93c5fd;
-      transform: translateY(-2px);
-    }
-
-    .question p {
-      line-height: 1.8;
-      margin-bottom: 12px;
-      font-weight: 500;
-    }
-
-    select {
-      width: 100%;
-      padding: 12px;
-      border-radius: 12px;
-      border: 1px solid #cbd5e1;
-      font-size: 1rem;
-      background: #f8fafc;
-    }
-
-    .btn {
-      border: none;
-      padding: 10px 18px;
-      border-radius: 12px;
-      background: linear-gradient(90deg,#2563eb,#06b6d4);
-      color: white;
-      font-size: 1rem;
-      cursor: pointer;
-      font-weight: 700;
-      box-shadow: 0 6px 18px rgba(37,99,235,.2);
-    }
-
-    .report {
-      display: none;
-      margin-top: 40px;
-    }
-
-    .report-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      flex-wrap: wrap;
-      gap: 16px;
-      margin-bottom: 32px;
-    }
-
-    .report-card {
-      background: linear-gradient(135deg,#ffffff,#f8fbff);
-      border: 1px solid #dbeafe;
-      border-radius: 24px;
-      padding: 28px;
-      margin-bottom: 20px;
-    }
-
-    .report-card h3 {
-      margin-bottom: 16px;
-      color: #1d4ed8;
-    }
-
-    .status {
-      display: inline-block;
-      margin-top: 12px;
-      padding: 8px 14px;
-      border-radius: 999px;
-      background: #dbeafe;
-      color: #1d4ed8;
-      font-weight: 700;
-    }
-
-    ul {
-      padding-left: 20px;
-      line-height: 2;
-      color: #334155;
-    }
-
-    canvas {
-      max-width: 600px;
-      margin: 30px auto;
-    }
-
-    .footer-note {
-      margin-top: 40px;
-      text-align: center;
-      color: #64748b;
-      line-height: 1.8;
-    }
-
-    @media(max-width:768px){
-      body{padding:16px;}
-      .hero,.section{padding:24px;}
-      h1{font-size:2rem;}
-    }
-    
-    .mini-header{
-      position: fixed;
-      top: -100px;
-      left: 50%;
-      transform: translateX(-50%);
-      width: calc(100% - 32px);
-      max-width: 1200px;
-
-      background: rgba(255,255,255,.88);
-      backdrop-filter: blur(14px);
-
-      border: 1px solid rgba(255,255,255,.5);
-
-      border-radius: 18px;
-
-      padding: 12px 18px;
-
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-
-      box-shadow: 0 10px 30px rgba(0,0,0,.08);
-
-      z-index: 999;
-
-      transition: all .35s ease;
-    }
-    
-    .mini-header.show{
-      top: 12px;
-    }
-
-    .mini-title{
-      font-size: 1rem;
-      font-weight: 800;
-      color: #0f172a;
-    }
-    .mini-score{
-      font-weight: 700;
-      color: #2563eb;
-    }
-    .mini-btn{
-      border:none;
-      padding:10px 16px;
-      border-radius:12px;
-
-      background: linear-gradient(90deg,#2563eb,#06b6d4);
-
-      color:white;
-      font-weight:700;
-      cursor:pointer;
-    }
-    
-  </style>
+  /* RESPONSIVE */
+  @media (max-width: 640px) {
+    .question-item { flex-wrap: wrap; gap: 8px; }
+    .q-text { min-width: 100%; order: 2; }
+    .q-num { order: 1; }
+    .q-select { order: 3; width: 100%; }
+    .report-score-grid { grid-template-columns: repeat(3, 1fr); }
+    .dashboard-inner { justify-content: center; }
+    .dim-scores { justify-content: center; }
+    .gen-report-inner { flex-direction: column; align-items: stretch; }
+    .btn-generate { justify-content: center; }
+    .gen-info { text-align: center; }
+  }
+  @media (max-width: 420px) {
+    .report-score-grid { grid-template-columns: repeat(2, 1fr); }
+    .dim-chip { font-size: 11px; padding: 5px 10px; }
+  }
+</style>
 </head>
 <body>
-  <div class="container">
 
-    <div class="hero">
-      <h1>五維財富動力學</h1>
-      <p class="subtitle">
-        個人資源盤點系統｜請使用者直接下拉選單點選分數，點擊"生成個人分析報告"查看結果。
-      </p>
+<header class="site-header">
+  <div class="header-tag">100 題完整版</div>
+  <h1>五維財富動力學</h1>
+  <div class="header-sub">個人資源盤點評估系統</div>
+  <div class="scoring-guide">
+    <div class="score-item"><div class="score-badge" style="background:#DC3545;color:white">1</div>幾乎從不 / 完全不符合</div>
+    <div class="score-item"><div class="score-badge" style="background:#FD7E14;color:white">2</div>偶爾 / 較少符合</div>
+    <div class="score-item"><div class="score-badge" style="background:#FFC107;color:black">3</div>有時 / 部分符合</div>
+    <div class="score-item"><div class="score-badge" style="background:#28A745;color:white">4</div>經常 / 大多符合</div>
+    <div class="score-item"><div class="score-badge" style="background:#1A2744;color:white">5</div>總是 / 完全符合</div>
+  </div>
+</header>
 
-      <div class="top-grid">
-        <div class="score-card">
-          <div class="score-title">金錢 MONEY</div>
-          <div class="score-value" id="moneyScore">0.0</div>
-        </div>
-
-        <div class="score-card">
-          <div class="score-title">精力 ENERGY</div>
-          <div class="score-value" id="energyScore">0.0</div>
-        </div>
-
-        <div class="score-card">
-          <div class="score-title">時間 TIME</div>
-          <div class="score-value" id="timeScore">0.0</div>
-        </div>
-
-        <div class="score-card">
-          <div class="score-title">人脈 CONNECTIONS</div>
-          <div class="score-value" id="connectionScore">0.0</div>
-        </div>
-
-        <div class="score-card">
-          <div class="score-title">能力 CAPABILITY</div>
-          <div class="score-value" id="abilityScore">0.0</div>
-        </div>
-      </div>
-
-      <button class="btn" onclick="generateReport()">生成個人分析報告</button>
+<div class="dashboard">
+  <div class="dashboard-inner">
+    <div class="dim-scores">
+      <div class="dim-chip"><div class="dim-icon" style="background:var(--gold)"></div>金錢 <span class="score-val" id="dash-money">—</span></div>
+      <div class="dim-chip"><div class="dim-icon" style="background:var(--teal-light)"></div>精力 <span class="score-val" id="dash-energy">—</span></div>
+      <div class="dim-chip"><div class="dim-icon" style="background:var(--sky)"></div>時間 <span class="score-val" id="dash-time">—</span></div>
+      <div class="dim-chip"><div class="dim-icon" style="background:var(--lavender)"></div>人脈 <span class="score-val" id="dash-network">—</span></div>
+      <div class="dim-chip"><div class="dim-icon" style="background:var(--coral)"></div>能力 <span class="score-val" id="dash-capability">—</span></div>
     </div>
-
-    <div class="mini-header" id="miniHeader">
-      <div class="mini-title">
-        五維財富動力學
-      </div>
-      <div class="mini-score">
-        整體財富轉化效率：<span id="miniOverall">0.0</span>
-      </div>
-
-      <button class="mini-btn" onclick="generateReport()">
-        生成報告
-      </button>
-    </div>
-    
-    <div id="questionContainer"></div>
-
-    <div class="report" id="reportSection">
-      <div class="section">
-        <div class="report-header">
-          <div>
-            <h2>個人深度分析報告</h2>
-            <p id="overallText"></p>
-          </div>
-        </div>
-
-        <canvas id="radarChart"></canvas>
-
-        <div id="reportCards"></div>
-      </div>
-    </div>
-
-    <div class="footer-note">
-      五維財富動力學 © 2026 ｜ Global ESG Leadership Organization
+    <div class="total-badge">
+      <div class="label">整體效率總分</div>
+      <div class="value" id="dash-total">—</div>
+      <div style="font-size:11px;opacity:0.6">/ 10</div>
     </div>
   </div>
+</div>
 
-  <script>
-    const dimensions = {
-  "money": {
-    "title": "金錢 MONEY",
-    "description": "財務安全、資產增值與金流管理能力",
-    subDimensions:{
-      '財務安全基礎':[0,1,2,3],
-      '支出決策品質':[4,5,6,7],
-      '資產增值':[8,9,10,11],
-      '財務決策品質':[12,13,14,15],
-      '財務目標清晰度':[16,17,18,19]
-          },
-    "questions": [
-      "我每個月固定將收入的20%以上，在花費之前就先撥入儲蓄或投資帳戶",
-      "如果明天失去工作，現有流動資金可以維持正常生活超過12個月",
-      "我清楚知道自己每個月固定支出的總金額，誤差在10%以內",
-      "我有一筆獨立的緊急備用金（至少3個月支出），從未在非緊急情況下動用過",
-      "花費超過月收入5%的金額之前，我會評估長期回報，而不只是當下的滿足感",
-      "上個月的支出清單中，「投資型支出」（提升能力、效率或系統）超過10%",
-      "我能清楚識別哪些消費是真正需求，哪些是為維持形象或跟隨他人而產生的",
-      "我每年花費相當於至少一個月收入在提升自己的學習、能力或工具系統上",
-      "我有至少一個不依賴我主動工作時間的收入來源（投資收益、版稅、租金等）",
-      "我的被動收入每個月超過我月支出的10%以上",
-      "我清楚知道自己主要投資的年化回報率，並且每季至少檢視一次",
-      "過去兩年，我的總資產淨值增長幅度超過了生活費用的增長幅度",
-      "我很少因為「限時優惠」「別人都在買」或一時衝動，做出超出計劃的重大消費決定",
-      "過去一年，我沒有因為情緒（壓力、興奮、焦慮）做出後來感到後悔的重大財務決定",
-      "面對投資機會時，我會主動尋找「可能出錯的地方」，而不是只看潛在收益",
-      "我每年至少做一次完整的財務盤點，了解自己的資產、負債和現金流狀況",
-      "我有一個具體的「財務自由數字」（不依賴工作也能維持生活的資產金額），並定期追蹤進度",
-      "我的財務計劃不只是「希望多存一點錢」，而是有具體的年度目標和達成路徑",
-      "過去一年，我的財富增長速度讓我感到滿意，正在朝著財務自由的方向前進",
-      "我的伴侶或家人了解我的財務狀況和計劃，不存在因資訊不透明產生的摩擦"
-    ]
-  },
-  "energy": {
-    "title": "精力 ENERGY",
-    "description": "體能、情緒與恢復能力",
-    "questions": [
-      "我一週有4天以上，早晨醒來時感到精力充沛，不需要鬧鐘多次才能起床",
-      "我一週有3天以上可以睡滿7-8小時，且不靠藥物或酒精輔助",
-      "我每週至少進行3次、每次30分鐘以上的有氧或肌力運動",
-      "我的日常飲食穩定，不靠咖啡因、高糖食物或提神飲料撐過下午的工作",
-      "下午三點後，我仍能保持清晰的思維和判斷力，不感到明顯的思維遲緩或決策疲勞",
-      "每週我有至少3個時段，能進入完全不受打擾的深度專注狀態，每次超過60分鐘",
-      "我知道自己一天中認知能力最強的時段（高峰期），並有意識地把重要決策安排在那時",
-      "工作結束後，我通常仍有足夠精力陪伴家人、進行個人興趣或做重要的私人決策",
-      "面臨超出預期的壓力或突發狀況時，通常能在48小時內恢復到穩定的工作狀態",
-      "我能清楚識別哪些特定的人、事、環境讓我精力大量消耗，並主動減少不必要的接觸",
-      "一週之中，我感到「情緒內耗」（做了很多但感覺毫無意義）的時間不超過兩天",
-      "我很少因為過去的決定或未來的擔憂，在工作時間消耗大量的心理能量",
-      "週末或假日，我能真正切斷工作模式（不查郵件、不回非緊急訊息）至少連續24小時",
-      "我有至少一項固定的恢復儀式（如每天早晨散步、每週日完全不工作），持續超過3個月",
-      "連續高強度工作一週後，我會主動安排恢復時間，而不是撐到崩潰才停下來",
-      "我一年有至少兩次，能夠完全脫離工作超過5天的真正休假（不帶電腦或不查工作訊息）",
-      "我目前每天所做的大部分工作，讓我感到有意義，而不只是在完成別人的要求",
-      "當我遇到重大挫折或失敗時，通常能在一週內恢復動力，繼續前進",
-      "回顧過去半年，我的整體精力水平是穩定或在提升的，而非持續感到耗竭",
-      "在事業、健康、家庭、個人成長這幾個領域，我感到大致平衡，而非嚴重偏廢"
-    ]
-  },
-  "time": {
-    "title": "時間 TIME",
-    "description": "時間主權、深度工作與優先順序管理",
-    "questions": [
-      "回顧上週，行事曆上超過50%的時間是我主動規劃和安排的，而非被他人的請求填滿",
-      "當別人臨時要求非緊急的會議或幫助時，我有能力延遲或婉拒，而不會立刻答應",
-      "我每週會花至少15分鐘，主動規劃下週的重要時間塊，而不只是被動地回應行事曆",
-      "過去一個月，我至少有一次對不符合我優先級的請求說了「不」或「目前無法」",
-      "每週我有至少3個90分鐘以上的深度工作時段，期間不查看手機、郵件或訊息",
-      "進入深度工作狀態時，我能在15分鐘內進入高度專注，不需要很長的暖機時間",
-      "我知道自己每天認知能力的高峰時段，並有意識地將最重要的工作安排在那時",
-      "過去一個月，深度工作時間佔我總工作時間的比例在30%以上",
-      "我的日常事務中，有至少20%是由他人（助理、外包、工具）完成的，而非我親自處理",
-      "我計算過自己的「隱性時薪」，並根據這個數字決定哪些事值得外包給別人",
-      "在交出一項任務後，我能放心讓對方完成，不需要過度跟進或頻繁確認細節",
-      "過去一年，我把至少一項原本自己做的固定工作成功外包或自動化",
-      "回顧上週，我花在「只有我能做的高影響力工作」上的時間超過30%",
-      "我很少在週末後悔，覺得那週的時間沒有花在真正重要的地方",
-      "我能清楚說出本週對我未來影響最大的一件事，而且那件事真的進入了我的行事曆",
-      "我的工作日裡，花在響應他人需求（回訊息、出席被動會議）的時間不超過40%",
-      "我大致清楚自己一天的時間去哪了，而不是常常感到「不知道時間去哪了」",
-      "我每個月都有追蹤或回顧自己時間分配的習慣，哪怕只是非正式地回想一下",
-      "過去三個月，我的深度工作時間是增加的，而不是被各種事務持續壓縮",
-      "我在工作日有意識地設定「斷線時間」（不查手機或訊息的時段），至少每天一次"
-    ]
-  },
-  "connections": {
-    "title": "人脈 CONNECTIONS",
-    "description": "人際資本、合作資源與網絡效益",
-    "questions": [
-      "我有至少8個人，在我今天打電話說「我需要幫忙」時，對方會認真回應並提供實質協助",
-      "我的人脈中，有至少3個人曾在重要場合主動為我背書、引薦或創造機會",
-      "過去一年，我通過人脈關係獲得了至少1個重要的機會、合作或資源（非靠自己主動找到）",
-      "我認識的人中，有至少2個能直接接觸到我下一個目標所在領域的關鍵人物",
-      "我的人脈涵蓋至少5個不同的行業或領域，而不是幾乎全部集中在自己的專業圈子",
-      "我的人脈中有至少3個人，其職位或影響力明顯高於我目前的層級",
-      "過去半年，我主動認識了至少2個來自我原本不熟悉的行業或背景的新朋友",
-      "我知道自己的人脈在哪些行業或層級有明顯空白，並認識到這是需要改善的地方",
-      "過去一個月，我主動聯繫了至少3個有一段時間沒有互動的舊聯絡人",
-      "我有定期維護重要人脈的習慣（例如每季聯繫一次），而不只是等對方主動",
-      "當我認識一個值得深交的新朋友後，通常會在一週內主動跟進，而不是等待緣分",
-      "在重要人脈關係上的投入是持續且主動的，而非只在需要時才付出",
-      "建立新關係時，我通常能具體說出自己能為對方帶來什麼價值，而不只是希望對方幫助我",
-      "我是某兩個原本不相連的圈子之間的橋樑，定期把不同背景的人相互介紹",
-      "如果我今天辭職或關閉公司，我相信大部分核心人脈關係不會因此消失",
-      "我有一個非正式的「個人顧問委員會」，至少5個人，在重大決策時可以諮詢他們",
-      "過去一年，有至少一次意外的機會，是通過一個我平常不常聯絡的「弱連結」帶來的",
-      "我認識的人中，有不少人清楚知道我目前的目標，會在合適時機主動為我引薦",
-      "在我的社群或圈子裡，我有一定的聲望，讓人一想到特定需求就會想到我",
-      "我的人脈質量在過去一年有明顯提升，不只是數量，而是關係深度和多元性都在改善"
-    ]
-  },
-  "ability": {
-    "title": "能力 CAPABILITY",
-    "description": "專業能力、學習成長與差異化優勢",
-    "questions": [
-      "我能在3分鐘內，向一個不熟悉我行業的人清楚解釋我的能力解決什麼問題、帶來什麼結果",
-      "在我的專業領域，我有信心自己的知識和技能達到市場前20%的水平（有客觀依據）",
-      "過去一年，我的專業知識或技能有實質性的深化，而不是停留在三年前的水平",
-      "市場上有人曾主動尋找我的專業意見或服務，而非只有我主動推銷時才有人需要我",
-      "我能清楚說出自己核心服務或能力的市場定價，且這個定價是基於市場調研的",
-      "過去一年，我有主動創造至少一個將自己能力商業化的新嘗試（新服務、新客戶、新合作）",
-      "我的收入談判能力讓我感到獲得了合理回報，而不是常常覺得被低估或不敢開口要價",
-      "我能把自己的能力清楚包裝成一個「解決方案」，讓客戶或雇主一看就明白它的價值",
-      "我的收入中，有部分不需要我一對一親自投入時間就能產生（課程、諮詢包、工具、內容等）",
-      "我有至少一個「知識資產」（文章系列、課程、工具、書籍、模板），可以在我不在場時繼續創造價值",
-      "過去一年，我的時間投入與收入的比例有往更高槓桿的方向移動",
-      "如果今天想要服務10倍的客戶或受眾，我知道大概需要做什麼，而不是完全無從下手",
-      "我每個月至少花10小時在有計劃的學習上（書籍、課程、向導師請教），而不只是碎片化資訊",
-      "過去一年，我學習了至少一個全新的技能，而不只是在既有領域繼續加深",
-      "我能快速識別哪些新技能對我未來目標最有價值，而不是隨機或跟風地學習",
-      "我定期向比自己更強的人請教或學習，而不只是在自己的舒適圈內交流",
-      "在我的行業或目標市場中，有人會主動推薦我，因為我在某特定領域有清晰的專業定位",
-      "我能清楚說出自己與同水平競爭者的3個差異化優勢，而不感覺自己和別人差不多",
-      "我的能力放到一個完全不同的行業，仍然可以創造顯著的價值（有明確的知識套利空間）",
-      "我對未來3年的能力發展有清晰計劃，包括要學什麼、要停止什麼、以及如何提升槓桿"
-    ]
-  }
+<main class="main">
+  <div class="legend-wrap">
+    <span style="font-size:12px;font-weight:700;letter-spacing:1px;color:var(--text-light);margin-right:8px">評分解讀</span>
+    <div class="legend-item"><div class="legend-dot" style="background:#DC3545"></div>2–5分：系統瓶頸，優先突破</div>
+    <div class="legend-item"><div class="legend-dot" style="background:#FFC107"></div>5–7.5分：有基礎，需結構化提升</div>
+    <div class="legend-item"><div class="legend-dot" style="background:#28A745"></div>7.5–10分：槓桿資產，帶動其他維度</div>
+  </div>
+
+  <div class="dimension-section dim-money">
+    <div class="dim-header">
+      <div class="dim-title-wrap"><div class="dim-number">M</div><div><div class="dim-name">金錢維度</div><div class="dim-en">MONEY</div></div></div>
+      <div class="dim-score-display"><div class="s-label">維度得分</div><div><span class="s-val" id="score-money-display">—</span><span class="s-max"> / 10</span></div></div>
+    </div>
+    <div class="progress-bar-wrap"><div class="progress-label">填答進度 <span id="prog-money-text">0 / 20 題</span></div><div class="progress-track"><div class="progress-fill" id="prog-money-bar" style="width:0%"></div></div></div>
+    <div class="questions-wrap" id="questions-money"></div>
+    <div class="dim-subtotal"><span class="subtotal-label">金錢維度得分</span><span class="subtotal-val"><span id="score-money">—</span> / 10</span></div>
+  </div>
+
+  <div class="dimension-section dim-energy">
+    <div class="dim-header">
+      <div class="dim-title-wrap"><div class="dim-number">E</div><div><div class="dim-name">精力維度</div><div class="dim-en">ENERGY</div></div></div>
+      <div class="dim-score-display"><div class="s-label">維度得分</div><div><span class="s-val" id="score-energy-display">—</span><span class="s-max"> / 10</span></div></div>
+    </div>
+    <div class="progress-bar-wrap"><div class="progress-label">填答進度 <span id="prog-energy-text">0 / 20 題</span></div><div class="progress-track"><div class="progress-fill" id="prog-energy-bar" style="width:0%"></div></div></div>
+    <div class="questions-wrap" id="questions-energy"></div>
+    <div class="dim-subtotal"><span class="subtotal-label">精力維度得分</span><span class="subtotal-val"><span id="score-energy">—</span> / 10</span></div>
+  </div>
+
+  <div class="dimension-section dim-time">
+    <div class="dim-header">
+      <div class="dim-title-wrap"><div class="dim-number">T</div><div><div class="dim-name">時間維度</div><div class="dim-en">TIME</div></div></div>
+      <div class="dim-score-display"><div class="s-label">維度得分</div><div><span class="s-val" id="score-time-display">—</span><span class="s-max"> / 10</span></div></div>
+    </div>
+    <div class="progress-bar-wrap"><div class="progress-label">填答進度 <span id="prog-time-text">0 / 20 題</span></div><div class="progress-track"><div class="progress-fill" id="prog-time-bar" style="width:0%"></div></div></div>
+    <div class="questions-wrap" id="questions-time"></div>
+    <div class="dim-subtotal"><span class="subtotal-label">時間維度得分</span><span class="subtotal-val"><span id="score-time">—</span> / 10</span></div>
+  </div>
+
+  <div class="dimension-section dim-network">
+    <div class="dim-header">
+      <div class="dim-title-wrap"><div class="dim-number">N</div><div><div class="dim-name">人脈維度</div><div class="dim-en">CONNECTIONS</div></div></div>
+      <div class="dim-score-display"><div class="s-label">維度得分</div><div><span class="s-val" id="score-network-display">—</span><span class="s-max"> / 10</span></div></div>
+    </div>
+    <div class="progress-bar-wrap"><div class="progress-label">填答進度 <span id="prog-network-text">0 / 20 題</span></div><div class="progress-track"><div class="progress-fill" id="prog-network-bar" style="width:0%"></div></div></div>
+    <div class="questions-wrap" id="questions-network"></div>
+    <div class="dim-subtotal"><span class="subtotal-label">人脈維度得分</span><span class="subtotal-val"><span id="score-network">—</span> / 10</span></div>
+  </div>
+
+  <div class="dimension-section dim-capability">
+    <div class="dim-header">
+      <div class="dim-title-wrap"><div class="dim-number">C</div><div><div class="dim-name">能力維度</div><div class="dim-en">CAPABILITY</div></div></div>
+      <div class="dim-score-display"><div class="s-label">維度得分</div><div><span class="s-val" id="score-capability-display">—</span><span class="s-max"> / 10</span></div></div>
+    </div>
+    <div class="progress-bar-wrap"><div class="progress-label">填答進度 <span id="prog-capability-text">0 / 20 題</span></div><div class="progress-track"><div class="progress-fill" id="prog-capability-bar" style="width:0%"></div></div></div>
+    <div class="questions-wrap" id="questions-capability"></div>
+    <div class="dim-subtotal"><span class="subtotal-label">能力維度得分</span><span class="subtotal-val"><span id="score-capability">—</span> / 10</span></div>
+  </div>
+</main>
+
+<div class="gen-report-section">
+  <div class="gen-report-inner">
+    <div class="gen-info">填答任意題目後即可生成報告，完整填寫100題可獲得最精準分析</div>
+    <button class="btn-generate" onclick="generateReport()">
+      <span>📊</span> 生成個人分析報告
+    </button>
+  </div>
+</div>
+
+<div class="report-overlay" id="reportOverlay" onclick="closeReportOnBg(event)">
+  <div class="report-modal" id="reportModal">
+    <div class="report-modal-header">
+      <h2>五維財富動力學 · 個人深度分析報告</h2>
+      <div class="sub">本報告根據您的100題盤點問卷自動生成 · 為個人保密文件</div>
+      <button class="report-close" onclick="closeReport()">✕</button>
+    </div>
+    <div id="reportContent"></div>
+  </div>
+</div>
+
+<script>
+const QUESTIONS = {
+  money: [
+    "M1.   我每個月固定將收入的20%以上，在花費之前就先撥入儲蓄或投資帳戶",
+    "M2.   如果明天失去工作，現有流動資金可以維持正常生活超過12個月",
+    "M3.   我清楚知道自己每個月固定支出的總金額，誤差在10%以內",
+    "M4.   我有一筆獨立的緊急備用金（至少3個月支出），從未在非緊急情況下動用過",
+    "M5.   花費超過月收入5%的金額之前，我會評估長期回報，而不只是當下的滿足感",
+    "M6.   上個月的支出清單中，「投資型支出」（提升能力、效率或系統）超過10%",
+    "M7.   我能清楚識別哪些消費是真正需求，哪些是為維持形象或跟隨他人而產生的",
+    "M8.   我每年花費相當於至少一個月收入在提升自己的學習、能力或工具系統上",
+    "M9.   我有至少一個不依賴我主動工作時間的收入來源（投資收益、版稅、租金等）",
+    "M10.  我的被動收入每個月超過我月支出的10%以上",
+    "M11.  我清楚知道自己主要投資的年化回報率，並且每季至少檢視一次",
+    "M12.  過去兩年，我的總資產淨值增長幅度超過了生活費用的增長幅度",
+    "M13.  我很少因為「限時優惠」「別人都在買」或一時衝動，做出超出計劃的重大消費決定",
+    "M14.  過去一年，我沒有因為情緒（壓力、興奮、焦慮）做出後來感到後悔的重大財務決定",
+    "M15.  面對投資機會時，我會主動尋找「可能出錯的地方」，而不是只看潛在收益",
+    "M16.  我每年至少做一次完整的財務盤點，了解自己的資產、負債和現金流狀況",
+    "M17.  我有一個具體的「財務自由數字」（不依賴工作也能維持生活的資產金額），並定期追蹤進度",
+    "M18.  我的財務計劃不只是「希望多存一點錢」，而是有具體的年度目標和達成路徑",
+    "M19.  過去一年，我的財富增長速度讓我感到滿意，正在朝著財務自由的方向前進",
+    "M20.  我的伴侶或家人了解我的財務狀況和計劃，不存在因資訊不透明產生的摩擦"
+  ],
+  energy: [
+    "E1.   我一週有4天以上，早晨醒來時感到精力充沛，不需要鬧鐘多次才能起床",
+    "E2.   我一週有3天以上可以睡滿7-8小時，且不靠藥物或酒精輔助",
+    "E3.   我每週至少進行3次、每次30分鐘以上的有氧或肌力運動",
+    "E4.   我的日常飲食穩定，不靠咖啡因、高糖食物或提神飲料撐過下午的工作",
+    "E5.   下午三點後，我仍能保持清晰的思維和判斷力，不感到明顯的思維遲緩或決策疲勞",
+    "E6.   每週我有至少3個時段，能進入完全不受打擾的深度專注狀態，每次超過60分鐘",
+    "E7.   我知道自己一天中認知能力最強的時段（高峰期），並有意識地把重要決策安排在那時",
+    "E8.   工作結束後，我通常仍有足夠精力陪伴家人、進行個人興趣或做重要的私人決策",
+    "E9.   面臨超出預期的壓力或突發狀況時，通常能在48小時內恢復到穩定的工作狀態",
+    "E10.  我能清楚識別哪些特定的人、事、環境讓我精力大量消耗，並主動減少不必要的接觸",
+    "E11.  一週之中，我感到「情緒內耗」（做了很多但感覺毫無意義）的時間不超過兩天",
+    "E12.  我很少因為過去的決定或未來的擔憂，在工作時間消耗大量的心理能量",
+    "E13.  週末或假日，我能真正切斷工作模式（不查郵件、不回非緊急訊息）至少連續24小時",
+    "E14.  我有至少一項固定的恢復儀式（如每天早晨散步、每週日完全不工作），持續超過3個月",
+    "E15.  連續高強度工作一週後，我會主動安排恢復時間，而不是撐到崩潰才停下來",
+    "E16.  我一年有至少兩次，能夠完全脫離工作超過5天的真正休假（不帶電腦或不查工作訊息）",
+    "E17.  我目前每天所做的大部分工作，讓我感到有意義，而不只是在完成別人的要求",
+    "E18.  當我遇到重大挫折或失敗時，通常能在一週內恢復動力，繼續前進",
+    "E19.  回顧過去半年，我的整體精力水平是穩定或在提升的，而非持續感到耗竭",
+    "E20.  在事業、健康、家庭、個人成長這幾個領域，我感到大致平衡，而非嚴重偏廢"
+  ],
+  time: [
+    "T1.   回顧上週，行事曆上超過50%的時間是我主動規劃和安排的，而非被他人的請求填滿",
+    "T2.   當別人臨時要求非緊急的會議或幫助時，我有能力延遲或婉拒，而不會立刻答應",
+    "T3.   我每週會花至少15分鐘，主動規劃下週的重要時間塊，而不只是被動地回應行事曆",
+    "T4.   過去一個月，我至少有一次對不符合我優先級的請求說了「不」或「目前無法」",
+    "T5.   每週我有至少3個90分鐘以上的深度工作時段，期間不查看手機、郵件或訊息",
+    "T6.   進入深度工作狀態時，我能在15分鐘內進入高度專注，不需要很長的暖機時間",
+    "T7.   我知道自己每天認知能力的高峰時段，並有意識地將最重要的工作安排在那時",
+    "T8.   過去一個月，深度工作時間佔我總工作時間的比例在30%以上",
+    "T9.   我的日常事務中，有至少20%是由他人（助理、外包、工具）完成的，而非我親自處理",
+    "T10.  我計算過自己的「隱性時薪」，並根據這個數字決定哪些事值得外包給別人",
+    "T11.  在交出一項任務後，我能放心讓對方完成，不需要過度跟進或頻繁確認細節",
+    "T12.  過去一年，我把至少一項原本自己做的固定工作成功外包或自動化",
+    "T13.  回顧上週，我花在「只有我能做的高影響力工作」上的時間超過30%",
+    "T14.  我很少在週末後悔，覺得那週的時間沒有花在真正重要的地方",
+    "T15.  我能清楚說出本週對我未來影響最大的一件事，而且那件事真的進入了我的行事曆",
+    "T16.  我的工作日裡，花在響應他人需求（回訊息、出席被動會議）的時間不超過40%",
+    "T17.  我大致清楚自己一天的時間去哪了，而不是常常感到「不知道時間去哪了」",
+    "T18.  我每個月都有追蹤或回顧自己時間分配的習慣，哪怕只是非正式地回想一下",
+    "T19.  過去三個月，我的深度工作時間是增加的，而不是被各種事務持續壓縮",
+    "T20.  我在工作日有意識地設定「斷線時間」（不查手機或訊息的時段），至少每天一次"
+  ],
+  network: [
+    "N1.   我有至少8個人，在我今天打電話說「我需要幫忙」時，對方會認真回應並提供實質協助",
+    "N2.   我的人脈中，有至少3個人曾在重要場合主動為我背書、引薦或創造機會",
+    "N3.   過去一年，我通過人脈關係獲得了至少1個重要的機會、合作或資源（非靠自己主動找到）",
+    "N4.   我認識的人中，有至少2個能直接接觸到我下一個目標所在領域的關鍵人物",
+    "N5.   我的人脈涵蓋至少5個不同的行業或領域，而不是幾乎全部集中在自己的專業圈子",
+    "N6.   我的人脈中有至少3個人，其職位或影響力明顯高於我目前的層級",
+    "N7.   過去半年，我主動認識了至少2個來自我原本不熟悉的行業或背景的新朋友",
+    "N8.   我知道自己的人脈在哪些行業或層級有明顯空白，並認識到這是需要改善的地方",
+    "N9.   過去一個月，我主動聯繫了至少3個有一段時間沒有互動的舊聯絡人",
+    "N10.  我有定期維護重要人脈的習慣（例如每季聯繫一次），而不只是等對方主動",
+    "N11.  當我認識一個值得深交的新朋友後，通常會在一週內主動跟進，而不是等待緣分",
+    "N12.  在重要人脈關係上的投入是持續且主動的，而非只在需要時才付出",
+    "N13.  建立新關係時，我通常能具體說出自己能為對方帶來什麼價值，而不只是希望對方幫助我",
+    "N14.  我是某兩個原本不相連的圈子之間的橋樑，定期把不同背景的人相互介紹",
+    "N15.  如果我今天辭職或關閉公司，我相信大部分核心人脈關係不會因此消失",
+    "N16.  我有一個非正式的「個人顧問委員會」，至少5個人，在重大決策時可以諮詢他們",
+    "N17.  過去一年，有至少一次意外的機會，是通過一個我平常不常聯絡的「弱連結」帶來的",
+    "N18.  我認識的人中，有不少人清楚知道我目前的目標，會在合適時機主動為我引薦",
+    "N19.  在我的社群或圈子裡，我有一定的聲望，讓人一想到特定需求就會想到我",
+    "N20.  我的人脈質量在過去一年有明顯提升，不只是數量，而是關係深度和多元性都在改善"
+  ],
+  capability: [
+    "C1.   我能在3分鐘內，向一個不熟悉我行業的人清楚解釋我的能力解決什麼問題、帶來什麼結果",
+    "C2.   在我的專業領域，我有信心自己的知識和技能達到市場前20%的水平（有客觀依據）",
+    "C3.   過去一年，我的專業知識或技能有實質性的深化，而不是停留在三年前的水平",
+    "C4.   市場上有人曾主動尋找我的專業意見或服務，而非只有我主動推銷時才有人需要我",
+    "C5.   我能清楚說出自己核心服務或能力的市場定價，且這個定價是基於市場調研的",
+    "C6.   過去一年，我有主動創造至少一個將自己能力商業化的新嘗試（新服務、新客戶、新合作）",
+    "C7.   我的收入談判能力讓我感到獲得了合理回報，而不是常常覺得被低估或不敢開口要價",
+    "C8.   我能把自己的能力清楚包裝成一個「解決方案」，讓客戶或雇主一看就明白它的價值",
+    "C9.   我的收入中，有部分不需要我一對一親自投入時間就能產生（課程、諮詢包、工具、內容等）",
+    "C10.  我有至少一個「知識資產」（文章系列、課程、工具、書籍、模板），可以在我不在場時繼續創造價值",
+    "C11.  過去一年，我的時間投入與收入的比例有往更高槓桿的方向移動",
+    "C12.  如果今天想要服務10倍的客戶或受眾，我知道大概需要做什麼，而不是完全無從下手",
+    "C13.  我每個月至少花10小時在有計劃的學習上（書籍、課程、向導師請教），而不只是碎片化資訊",
+    "C14.  過去一年，我學習了至少一個全新的技能，而不只是在既有領域繼續加深",
+    "C15.  我能快速識別哪些新技能對我未來目標最有價值，而不是隨機或跟風地學習",
+    "C16.  我定期向比自己更強的人請教或學習，而不只是在自己的舒適圈內交流",
+    "C17.  在我的行業或目標市場中，有人會主動推薦我，因為我在某特定領域有清晰的專業定位",
+    "C18.  我能清楚說出自己與同水平競爭者的3個差異化優勢，而不感覺自己和別人差不多",
+    "C19.  我的能力放到一個完全不同的行業，仍然可以創造顯著的價值（有明確的知識套利空間）",
+    "C20.  我對未來3年的能力發展有清晰計劃，包括要學什麼、要停止什麼、以及如何提升槓桿"
+  ]
 };
 
-const questionContainer = document.getElementById('questionContainer');
+const SUB_DIMS = {
+  money: ['財務安全基礎','支出決策品質','資產增值','財務決策品質','財務目標清晰度'],
+  energy: ['體能基礎','認知表現','情緒穩定性','恢復能力','方向與意義'],
+  time: ['時間主權','深度工作','授權與外包','優先級執行','時間意識'],
+  network: ['核心人脈質量','人脈多樣性','主動維護','價值創造','網絡效益'],
+  capability: ['專業深度','商業化能力','槓桿與規模','持續學習','市場定位']
+};
 
-    Object.keys(dimensions).forEach(key => {
-      const section = document.createElement('div');
-      section.className = 'section';
+const TEXT_DB = {
+  '金錢_L1': { level:'系統瓶頸', text1:'財富結構存在根本性缺口：金錢的流向缺乏系統設計，支出先於儲蓄，被動收入幾乎為零。', text2:'這不只是「沒有存夠錢」，而是整個財務系統需要從零重新架構——先設計，後花費。', insight:'▶ 核心問題：金錢是「流入即流出」而非「流入即分配」。建立財務自動化系統是首要任務。', actions:['本週設立自動扣款：薪資入帳24小時內，自動轉出至少月收入10%到獨立儲蓄帳戶','計算財務跑道：流動資產 ÷ 月固定支出，低於6個月需立即優化支出結構','建立緊急備用金帳戶（獨立帳戶），設定3個月支出為初始目標，到達後才開始進行投資'] },
+  '金錢_L2': { level:'待提升', text1:'有基本財務意識，但執行的系統性和一致性仍不足。財務決策偶爾受情緒影響，被動收入佔比偏低。', text2:'整體財富增長速度可能落後於你的收入水平應有的表現，主要是執行落差造成的。', insight:'▶ 核心問題：從「知道要這樣做」到「系統化地做到」，存在明顯的執行落差，需要把好意志轉化為自動機制。', actions:['設立「24小時冷靜期」規則：超過月收入3%的非計劃消費，等24小時後再決定是否購買','每月底花20分鐘把支出標記為投資型或消費型，計算比例並追蹤每月變化趨勢','識別3項「身份維護型支出」，評估是否可在不影響核心生活品質的前提下削減或替代'] },
+  '金錢_L3': { level:'良好基礎', text1:'展現相當成熟的財務管理能力：有固定儲蓄習慣、基本的資產配置，財務決策品質良好。', text2:'目前財富增長處於穩定軌道，但距離「加速增長」仍有空間，被動收入的比例是關鍵槓桿點。', insight:'▶ 核心機會：被動收入比例和投資型支出比例，是目前最容易撬動整體財富增長速度的兩個槓桿。', actions:['建立或優化一個現有被動收入來源，設定讓它在本年度增長30%的具體行動計劃','每年做一次完整財務盤點（資產、負債、現金流），建立淨資產追蹤表並設定年度增長目標','把財務目標拆解為年度、季度、月度的具體行動——不只是金額目標，而是每月的系統行動'] },
+  '金錢_L4': { level:'槓桿資產', text1:'金錢維度已達到高水平，金錢在幫你工作。財富系統具備強大的自動化和槓桿特性，被動收入提供結構自由。', text2:'此維度已成為你的核心優勢資產。思考如何用金錢換取其他維度的提升，打造完整的財富飛輪。', insight:'▶ 核心機會：用金錢換取時間（授權外包）、換取能力（精準學習投資），讓五維系統相互加速。', actions:['評估目前各類資產的效率，識別可以調整配置以獲得更高系統自由度的機會','識別可以用金錢購買的最高價值「時間或能力投資」，本季度執行一個高槓桿決策','設計「財富飛輪」：金錢如何流入其他四個維度，再由其他維度反饋更多金錢回來？'] },
+  '精力_L1': { level:'系統瓶頸', text1:'精力系統有嚴重漏洞，日常運作主要靠意志力硬撐而非系統支撐。', text2:'睡眠、運動、情緒調節等基礎層面的缺失，正在持續侵蝕你做出高品質決策的能力，影響所有其他維度。', insight:'▶ 核心問題：精力是財富系統的動力來源。此維度的崩塌會讓其他四個維度的表現全部打折。', actions:['設定固定睡眠時間（固定上床和起床）並持續21天，此事優先於任何工作需求','本週加入一項固定體能活動（30分鐘x3次），排入行事曆設為不可刪除','列出目前3個最主要的「精力漏電點」（人或事），針對每個制定減少接觸的具體行動'] },
+  '精力_L2': { level:'待提升', text1:'精力管理有一定意識但缺乏完整系統。高峰時段使用不夠精準，恢復品質不穩定。', text2:'偶爾出現精力透支後的連帶影響：情緒波動、決策品質下降、對重要工作失去動力。', insight:'▶ 核心問題：精力管理停留在「反應式」——透支後才修復，而非設計好預防透支的機制。', actions:['找出你的「認知高峰時段」（通常早上前2-3小時），下週起只在那時做最重要的決策和創造','建立壓力恢復協議：當感到情緒透支時，啟動一個固定的30分鐘恢復程序（非刷手機）','本週試行「單工模式」一個時段：關掉所有通知，只做一件事，記錄效率與感受的差異'] },
+  '精力_L3': { level:'良好基礎', text1:'精力結構相當穩定，有基本的充電習慣和恢復能力。體能基礎和情緒穩定性都有良好表現。', text2:'進一步提升的空間在於更精準地利用認知高峰，以及建立更系統化的深度恢復儀式。', insight:'▶ 核心機會：基礎已紮實。接下來是「精緻化」——讓好習慣更系統可預測，並把高峰時段的使用提升到新層次。', actions:['設計「週期性深度恢復儀式」：每週一次完全切斷的半天，每季一次3天以上的真正休息','優化你的「認知高峰保護系統」：讓最強的2小時只用於最高槓桿的創造性工作','評估目前運動和睡眠習慣，找出用更少時間獲得更好恢復效果的優化空間'] },
+  '精力_L4': { level:'槓桿資產', text1:'精力系統高度優化，表現建立在穩固的生理和心理基礎上。充電和恢復已成為系統的一部分。', text2:'高水平的精力管理讓你在其他人疲於奔命時，仍能維持清醒的決策品質和持續的創造能力。', insight:'▶ 核心優勢：此維度已是槓桿資產。思考如何讓這套精力管理模式帶動其他維度，並可能成為傳授他人的能力。', actions:['進一步精進「認知高峰」的使用品質：不只是保護時間，而是在那段時間產出更高槓桿的成果','評估你的精力系統是否可以支持更高強度的事業擴張，找出下一個成長天花板','思考如何把精力管理方法系統化，以便帶領團隊或作為未來教授他人的核心能力'] },
+  '時間_L1': { level:'系統瓶頸', text1:'時間主權嚴重匱乏，大部分時間被他人的優先級佔據。深度工作幾乎不存在，一直在響應而非創造。', text2:'你的日曆代表的是別人的優先級，而非你自己的。高影響力的工作永遠排在待辦清單的最後。', insight:'▶ 核心問題：你在用最好的時間做別人最緊急的事。這不只是時間管理問題，而是主導權的問題。', actions:['本週在行事曆上不可移動地鎖定一個90分鐘的深度工作塊，任何事情都不可以侵犯它','設立「訊息回覆的固定時段」（如10點12點16點），其他時間不即時回覆非緊急訊息','下次有人要求你立刻響應時，先暫停3秒，問自己：這件事符合我本週的最高優先級嗎？'] },
+  '時間_L2': { level:'待提升', text1:'有時間管理意識，但執行一致性不足。深度工作時間容易被壓縮，外包進度緩慢。', text2:'仍有相當比例時間花在他人優先事項上。從「懂得」到「持續做到」還有明顯的執行落差。', insight:'▶ 核心問題：遇到時間邊界受到挑戰時，傾向妥協而非堅持。時間邊界設定需要系統性強化。', actions:['建立「時間預算」機制：每週先在行事曆中保留A類創造時間，然後才允許其他事務填入','列出本週做的所有事，標記哪些「別人也可以做」，計算這些事佔你時間的百分比','本月識別一件每週重複的低價值工作，找到外包或自動化的方案並在本月內執行'] },
+  '時間_L3': { level:'良好基礎', text1:'時間結構相對健康，能保護一定比例的深度工作時間，並有基本的優先級意識。', text2:'時間主導感良好，能在必要時婉拒不符優先級的請求，行事曆大體上反映自己的目標。', insight:'▶ 核心機會：基礎已相當紮實。提升在於提高A類時間比例（目標40%以上），以及更系統化地外包執行型工作。', actions:['評估目前還有哪些執行型工作可以外包，計算外包後釋放時間的機會成本，找最高ROI的外包','把A類時間追蹤納入每週回顧：記錄比例、識別壓縮它的模式，每月設定提升目標','設計「週理想行程表」：如果這週完全按照自己優先級安排，每個時段應該做什麼？'] },
+  '時間_L4': { level:'槓桿資產', text1:'時間主權達到相當高水平，大部分時間按照自己的設計運作。深度工作有固定保護，外包系統成熟。', text2:'A類時間佔比達標，你已建立了少數高端人士才擁有的時間結構，高影響力工作得到充分保護。', insight:'▶ 核心優勢：思考如何把釋放出來的優質時間，更精準地投入到能產生指數級回報的創造性工作中。', actions:['進一步優化：目前哪些「還在親自做」的事其實可以外包，讓你的時間結構更極致？','評估你的深度工作產出質量——不只是時間量，而是那些時間裡產出的槓桿效應','思考如何把你的時間管理系統複製到團隊或重要夥伴，整體提升系統效能'] },
+  '人脈_L1': { level:'系統瓶頸', text1:'人脈結構存在根本性限制：深度不足、多樣性低、維護不主動。連結大多停留在「認識」層面。', text2:'當你面臨跨界轉型或尋找資源時，此維度將成為最大的掣肘。人脈需要主動設計，而非等待自然形成。', insight:'▶ 核心問題：缺乏策略性的人脈建立意識。需要從「等待關係自然發生」轉為「主動設計人脈結構」。', actions:['本週主動聯繫5個你希望深化關係的人，分享一則你認為對方會感興趣的資訊，不帶目的','建立「人脈維護清單」：列出20個重要連結，標記上次聯繫時間，超過3個月的立即行動','識別你的人脈在哪3個行業或層級有最大空白，制定本季度的一個破圈行動計劃'] },
+  '人脈_L2': { level:'待提升', text1:'有人脈意識，但網絡密度和多樣性仍不足。核心人脈可能達基本水平，但弱連結維護不系統。', text2:'機會的獲取仍以被動為主，缺乏策略性的網絡擴張計劃，大部分連結仍在同一個圈子內。', insight:'▶ 核心問題：人脈在「自己的圈子」內已穩定，但突破圈子、建立跨界連結的能力尚未形成。', actions:['建立「弱連結維護習慣」：每月主動聯繫3個有一段時間沒互動的舊連絡人，不帶目的','本月參加一個你平時不會去的行業活動，目標是認識3個來自新領域的新朋友','找到你人脈中兩個來自不同背景但可能互相創造價值的人，本週主動介紹他們認識'] },
+  '人脈_L3': { level:'良好基礎', text1:'人脈結構相當健康，有良好的核心人脈質量和一定程度的跨界連結。', text2:'弱連結有基本的維護習慣，偶爾有人脈帶來的意外機會。基礎相當紮實，進一步提升空間清晰。', insight:'▶ 核心機會：更策略性地填補人脈空白，並更主動地成為圈子之間的橋樑節點，打造指數級網絡效應。', actions:['識別你目前人脈中最重要的3個空白（哪些行業或層級最缺乏），制定針對性的建立計劃','建立你的非正式「個人顧問委員會」（5-7人）：確定名單，並在本月分別約談一次','每月至少一次，主動介紹兩個來自不同背景的人認識，成為更多圈子之間的橋樑節點'] },
+  '人脈_L4': { level:'槓桿資產', text1:'人脈已成為核心槓桿資產。連結網絡在需要時能產生指數級的資源放大效應，意外機會的頻率明顯高於平均。', text2:'你已建立了一個能主動為你創造機會的人脈系統，而不只是等待機會上門。', insight:'▶ 核心機會：如何系統化地「輸出」你的網絡價值，讓更多人從認識你中獲益，強化你的橋樑節點地位。', actions:['設計「人脈價值輸出系統」：定期舉辦連結活動、分享資訊或引薦，讓橋樑作用更顯著','評估你的個人顧問委員會是否需要更新升級——引進更高層級或新領域的成員？','思考如何讓你的人脈資產進一步轉化為商業機會、合作協議或具體的財富增長'] },
+  '能力_L1': { level:'系統瓶頸', text1:'能力的商業化程度遠低於專業深度，形成嚴重的「左手強、右手殘廢」格局。', text2:'多年的專業積累主要透過一對一時間換錢的方式變現，沒有槓桿，收入天花板清晰可見。', insight:'▶ 核心問題：專業能力本身不是問題。問題在於不知道如何定價、包裝，讓能力產生不依賴時間的回報。', actions:['把你的核心能力用一句話描述：我幫助（誰）解決（什麼問題），帶來（什麼結果），這是商業化的起點','做一次市場定價調研：找3個與你能力相近的市場參與者，了解他們的定價範圍和服務包裝方式','本季度主動創造一個能力商業化的新嘗試：一個新服務、新客戶，或一次諮詢的試定價'] },
+  '能力_L2': { level:'待提升', text1:'專業能力有一定市場認可，但商業化路徑仍不清晰。定價偏保守，知識資產建立緩慢。', text2:'收入結構中被動部分比例極低，能力的市場價值被低估，潛在的槓桿空間尚未被開發。', insight:'▶ 核心問題：從「能力型」轉向「槓桿型」的意識已萌芽，但缺乏具體的執行路徑和第一個可見的槓桿成果。', actions:['評估你目前的能力在槓桿四層的哪一層，制定上升一層的具體路徑和本年度時間表','識別你的能力中最適合「產品化」的部分，設計一個最小可行版本的知識輸出（模板、工具或小型課程）','計算你的「商業化缺口」：左手評分 - 右手評分，這個數字就是你最重要的成長空間'] },
+  '能力_L3': { level:'良好基礎', text1:'能力商業化達到相當水平，有清晰的市場定位和初步的知識資產。收入中已有部分不依賴直接時間投入。', text2:'進一步提升在於加速槓桿層級的躍升，以及更主動地開發知識套利機會。', insight:'▶ 核心機會：你已跨越「能力換時間」的基本階段。下一步是從「一對多」走向「不在場也有收入」。', actions:['評估現有能力中最有槓桿潛力的部分，設計一個可以系統化輸出的路徑（課程、工具、框架）','識別你的能力在哪個新領域或新市場有「知識套利」機會，你的常識可能是別人的稀缺資源','本季度把一個現有服務進行「升級包裝」：更清晰的定位、更強的差異化、更高的定價策略'] },
+  '能力_L4': { level:'槓桿資產', text1:'能力維度已成為核心槓桿引擎。知識資產在你不在場時持續創造價值，商業化路徑清晰，市場定位鮮明。', text2:'收入中的被動部分已達到可觀比例，你的能力已從「資源」升級為「系統」，在幫你工作。', insight:'▶ 核心優勢：思考如何讓現有能力槓桿進一步擴大：更廣的受眾觸及、更高的品牌溢價、更深的套利機會。', actions:['設計下一個「能力槓桿升級計劃」：從第三層到第四層（品牌/授權/投資），需要什麼準備？','評估你的知識資產組合：哪些在持續增值？哪些需要更新？哪些可以進一步擴大受眾規模？','思考如何把你的能力體系建構成可以授權或擴展的品牌，從個人能力走向系統影響力'] }
+};
 
-      section.innerHTML = `
-        <h2>${dimensions[key].title}</h2>
-        <p style="color:#64748b;margin-bottom:24px;">${dimensions[key].description}</p>
-      `;
+const DIMS = ['money','energy','time','network','capability'];
+const DIM_NAMES = { money:'金錢', energy:'精力', time:'時間', network:'人脈', capability:'能力' };
+const DIM_KEYS = { money:'金錢', energy:'精力', time:'時間', network:'人脈', capability:'能力' };
+const DIM_EN = { money:'MONEY', energy:'ENERGY', time:'TIME', network:'CONNECTIONS', capability:'CAPABILITY' };
+const CARD_CLS = { money:'sc-money', energy:'sc-energy', time:'sc-time', network:'sc-network', capability:'sc-capability' };
+const HDR_CLS = { money:'ab-money', energy:'ab-energy', time:'ab-time', network:'ab-network', capability:'ab-capability' };
+const SUB_COLOR = { money:'#C9A84C', energy:'#3AAFA0', time:'#3B82C4', network:'#7B6EA6', capability:'#E86B52' };
+const EMOJIS = { money:'💰', energy:'⚡', time:'⏱', network:'🤝', capability:'🎯' };
 
-      dimensions[key].questions.forEach((q,index) => {
-        const question = document.createElement('div');
-        question.className = 'question';
+const answers = {};
+DIMS.forEach(d => { answers[d] = Array(20).fill(0); });
 
-        question.innerHTML = `
-          <p>${index + 1}. ${q}</p>
-          <select data-dimension="${key}">
-            <option value="">請選擇評分</option>
-            <option value="1">1｜幾乎從不</option>
-            <option value="2">2｜偶爾</option>
-            <option value="3">3｜有時</option>
-            <option value="4">4｜經常</option>
-            <option value="5">5｜總是</option>
-          </select>
-        `;
-
-        section.appendChild(question);
-      });
-
-      questionContainer.appendChild(section);
+function buildQuestions() {
+  DIMS.forEach(dim => {
+    const wrap = document.getElementById('questions-' + dim);
+    QUESTIONS[dim].forEach((q, i) => {
+      const code = q.split('.')[0];
+      const text = q.substring(q.indexOf('.')+1).trim();
+      const item = document.createElement('div');
+      item.className = 'question-item';
+      item.innerHTML = `<span class="q-num">${code}</span><span class="q-text">${text}</span>
+        <select class="q-select" data-dim="${dim}" data-idx="${i}" onchange="onAnswer(this)">
+          <option value="0">選擇</option>
+          <option value="1">1 — 幾乎從不</option>
+          <option value="2">2 — 偶爾</option>
+          <option value="3">3 — 有時</option>
+          <option value="4">4 — 經常</option>
+          <option value="5">5 — 總是</option>
+        </select>`;
+      wrap.appendChild(item);
     });
+  });
+}
 
-    function calculateDimension(key){
-      const selects = document.querySelectorAll(`select[data-dimension="${key}"]`);
-      let total = 0;
-      let count = 0;
+function onAnswer(sel) {
+  answers[sel.dataset.dim][+sel.dataset.idx] = +sel.value;
+  sel.classList.toggle('has-value', +sel.value > 0);
+  updateScores();
+}
 
-      selects.forEach(select => {
-        if(select.value !== ''){
-          total += Number(select.value);
-          count++;
-        }
-      });
+function dimScore10(dim) {
+  return Math.round(answers[dim].reduce((a,b)=>a+b,0) / 10) / 10;
+}
 
-      if(count === 0) return 0;
-      return ((total / count) * 2).toFixed(1);
-    }
+function totalScore10() {
+  return Math.round(DIMS.map(dimScore10).reduce((a,b)=>a+b,0) / DIMS.length * 10) / 10;
+}
 
-    function getLevel(score){
-      if(score < 4.5) return '▼ 系統瓶頸';
-      if(score < 6.5) return '◆ 待提升';
-      if(score < 8.5) return '● 良好基礎';
-      return '★ 槓桿資產';
-    }
+function getFilledCount(dim) { return answers[dim].filter(v=>v>0).length; }
 
-    function getAdvice(key, score) {
-      const adviceMap = {
-       money: {
-          1:[
-            '你的財務安全邊界仍然偏弱，建議先建立 3-6 個月緊急預備金。',
-            '優先停止高情緒性消費，建立固定記帳與現金流追蹤。',
-            '短期目標應聚焦於「活下來」，而不是高風險投資。',
-            '目前最重要的不是快速致富，而是建立穩定財務底盤。',
-            '建議優先降低不必要固定支出，增加現金流安全性。'
-           ],
+function updateScores() {
+  DIMS.forEach(dim => {
+    const sc = dimScore10(dim);
+    const filled = getFilledCount(dim);
+    document.getElementById('prog-' + dim + '-text').textContent = filled + ' / 20 題';
+    document.getElementById('prog-' + dim + '-bar').style.width = (filled/20*100) + '%';
+    const disp = filled > 0 ? sc.toFixed(1) : '—';
+    document.getElementById('score-' + dim).textContent = disp;
+    document.getElementById('score-' + dim + '-display').textContent = disp;
+    document.getElementById('dash-' + dim).textContent = disp;
+  });
+  const any = DIMS.some(d => getFilledCount(d) > 0);
+  document.getElementById('dash-total').textContent = any ? totalScore10().toFixed(1) : '—';
+}
 
-          2:[
-            '你已經開始建立財務基礎，但資產增值系統仍不穩定。',
-            '建議開始建立自動化投資與年度資產配置機制。',
-            '接下來的關鍵是提升收入來源多樣性。',
-            '你的財務狀態正在改善，但仍容易受到突發事件影響。',
-            '建議建立更明確的中長期財務目標與追蹤系統。'
-            ],
+function getLevel(sc) {
+  if (sc < 5) return 'L1';
+  if (sc < 7.5) return 'L2';
+  if (sc < 9) return 'L3';
+  return 'L4';
+}
+function getLevelLabel(lv) { return {L1:'系統瓶頸',L2:'待提升',L3:'良好基礎',L4:'槓桿資產'}[lv]; }
+function getLevelColor(sc) { return sc<5?'#DC3545':sc<7.5?'#FFC107':sc<9?'#28A745':'#1A2744'; }
 
-          3:[
-            '你的財務結構已具有一定穩定性。',
-            '建議開始從「收入思維」轉向「資產思維」。',
-            '可以逐步建立被動收入與長期槓桿型資產。',
-            '你的財務決策已具備一定成熟度。',
-            '下一步應聚焦提高資產運作效率與長期增值能力。'
-            ],
+function subAvg(dim, si) {
+  const sl = answers[dim].slice(si*4, si*4+4);
+  return (sl.reduce((a,b)=>a+b,0)/4).toFixed(1);
+}
 
-          4:[
-            '你的金錢維度已接近高效資產運作狀態。',
-            '下一階段重點是提高資本效率與風險分散。',
-            '可開始布局長期自由現金流與跨領域投資。',
-            '你已具備相對成熟的財務系統與資產思維。',
-            '接下來應聚焦建立更高層級的財富槓桿與資本配置能力。'
-            ]
-           },
-        energy:{
-            1:[
-            '你的精力系統已接近長期透支狀態。',
-            '目前優先事項不是更努力，而是恢復睡眠、情緒與身體節奏。',
-            '請優先建立穩定休息與壓力恢復機制。',
-            '長期高壓與缺乏恢復，可能已影響你的認知品質與判斷力。',
-            '建議先降低外界消耗，再重新建立穩定生活節奏。'
-            ],
+function buildRadar(scores) {
+  const cx=160, cy=155, r=120;
+  const ordDims=['money','energy','time','network','capability'];
+  const ordNames=['金錢','精力','時間','人脈','能力'];
+  const lc={money:'#B8860B',energy:'#2A7D6F',time:'#2563A8',network:'#7B6EA6',capability:'#E86B52'};
+  const angles = ordDims.map((_,i)=>(i*2*Math.PI/5)-Math.PI/2);
+  const pt = (sc,i) => { const a=angles[i],d=(sc/10)*r; return [cx+d*Math.cos(a),cy+d*Math.sin(a)]; };
 
-            2:[
-            '你擁有基本運作能力，但恢復品質仍不足。',
-            '建議降低高消耗環境與資訊噪音。',
-            '固定運動與深度休息會大幅提升你的決策品質。',
-            '目前最大的問題不是能力不足，而是精力分散。',
-            '建議開始建立可持續的高品質作息與恢復循環。'
-            ],
+  let grid='', axes='';
+  for(let g=2;g<=10;g+=2){
+    const pts=angles.map(a=>{const d=(g/10)*r;return `${cx+d*Math.cos(a)},${cy+d*Math.sin(a)}`;}).join(' ');
+    grid+=`<polygon points="${pts}" fill="none" stroke="#E2D9C8" stroke-width="1"/>`;
+  }
+  angles.forEach(a=>{ axes+=`<line x1="${cx}" y1="${cy}" x2="${cx+r*Math.cos(a)}" y2="${cy+r*Math.sin(a)}" stroke="#E2D9C8" stroke-width="1"/>`; });
 
-            3:[
-            '你的精力系統相對穩定。',
-            '接下來要強化的是高峰認知管理與長期節奏。',
-            '建議開始建立深度工作與高品質恢復循環。',
-            '你已具備一定程度的情緒穩定性與續航力。',
-            '下一步應聚焦提高高價值輸出的穩定性。'
-            ],
+  const dpts=ordDims.map((d,i)=>pt(scores[d]||0,i));
+  const dStr=dpts.map(p=>p.join(',')).join(' ');
+  const dots=dpts.map((p,i)=>`<circle cx="${p[0]}" cy="${p[1]}" r="5" fill="${lc[ordDims[i]]}" stroke="white" stroke-width="2"/>`).join('');
 
-            4:[
-            '你的精力維度具備高韌性與高續航力。',
-            '你已具備長期高效輸出的基礎。',
-            '下一步是保護精力邊界，避免過度承擔。',
-            '你目前的狀態已接近高績效工作者的能量結構。',
-            '接下來應聚焦於長期可持續性與高階專注管理。'
-            ]
-           },
-        time:{
-            1:[
-            '你目前的時間結構高度被外界佔用。',
-            '建議優先建立「不可被打擾時段」。',
-            '現在最重要的是重新奪回時間主權。',
-            '你目前的時間配置可能過度反應式，而非主動式。',
-            '建議先刪除低價值任務與無效社交。'
-            ],
+  let labels='';
+  ordDims.forEach((d,i)=>{
+    const a=angles[i], lx=cx+(r+28)*Math.cos(a), ly=cy+(r+28)*Math.sin(a);
+    const sc=scores[d]||0;
+    labels+=`<text x="${lx}" y="${ly-6}" text-anchor="middle" font-size="12" font-weight="700" fill="${lc[d]}" font-family="'Noto Sans TC',sans-serif">${ordNames[i]}</text>
+    <text x="${lx}" y="${ly+10}" text-anchor="middle" font-size="13" font-weight="700" fill="#1A2744" font-family="'Noto Serif TC',serif">${sc.toFixed(1)}</text>`;
+  });
 
-            2:[
-            '你開始有時間管理意識，但執行穩定度不足。',
-            '建議導入 SOP、自動化與深度工作區塊。',
-            '減少低價值任務會大幅提高人生推進速度。',
-            '你需要開始區分「忙碌」與「有效推進」的差異。',
-            '下一步應聚焦於優先順序與節奏管理。'
-            ],
+  return `<svg viewBox="0 0 320 310" xmlns="http://www.w3.org/2000/svg" style="max-width:300px;width:100%">${grid}${axes}
+    <polygon points="${dStr}" fill="rgba(43,63,107,0.12)" stroke="rgba(43,63,107,0.7)" stroke-width="2.5"/>
+    ${dots}${labels}</svg>`;
+}
 
-            3:[
-            '你的時間配置已開始對齊長期目標。',
-            '下一步是提高槓桿與授權比例。',
-            '建議聚焦高價值決策與長期累積型任務。',
-            '你已開始具備一定程度的時間主權。',
-            '接下來應建立更高效率的系統化工作模式。'
-            ],
+function generateReport() {
+  const scores={};
+  DIMS.forEach(d=>{ scores[d]=dimScore10(d); });
+  const total=totalScore10();
+  let html='';
 
-            4:[
-            '你已具備高時間主權與長期節奏控制能力。',
-            '你目前適合建立更大規模的系統與團隊。',
-            '下一階段應聚焦影響力放大與時間槓桿。',
-            '你的時間配置已具備高成熟度與高效率。',
-            '接下來可開始優化長期自由度與策略性配置。'
-            ]
-           },
-        connections:{
-            1:[
-              '你的人脈網絡仍偏向孤立型結構。',
-              '建議優先建立可信任的核心支持圈。',
-              '短期內請增加高品質交流而非追求數量。',
-              '目前最重要的是建立穩定可信的人際連結。',
-              '建議從固定參與社群與主動互動開始。'
-            ],
-    
+  // Score cards
+  html+=`<div class="report-score-grid">`;
+  DIMS.forEach(d=>{
+    const sc=scores[d],lv=getLevel(sc);
+    html+=`<div class="score-card ${CARD_CLS[d]}"><div class="sc-icon">${EMOJIS[d]}</div><div class="sc-name">${DIM_NAMES[d]}</div><div class="sc-val">${sc.toFixed(1)}</div><div class="sc-max">/ 10</div><div class="sc-level">${getLevelLabel(lv)}</div></div>`;
+  });
+  html+=`</div>`;
 
-            2:[
-              '你已累積一定關係資源，但網絡效益尚未形成。',
-              '建議主動維護弱連結與跨領域人脈。',
-              '開始建立個人品牌能提高人脈回流效應。',
-              '你的人際結構已具基礎，但仍缺乏槓桿效應。',
-              '下一步應聚焦關係深度與長期信任。'
-              ],
+  // Radar
+  html+=`<div class="radar-section"><div class="radar-title">五維雷達圖</div><div class="radar-wrap">${buildRadar(scores)}</div></div>`;
 
-            3:[
-              '你的人脈系統已具有一定協作與機會流動能力。',
-              '下一步是提高影響力與價值交換能力。',
-              '建議開始經營高信任長期合作關係。',
-              '你已具備一定程度的社會資本。',
-              '接下來應建立更高層級的圈層與橋樑能力。'
-              ],
+  // Total
+  const tc=getLevelColor(total);
+  html+=`<div style="padding:20px 28px;background:white;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px">
+    <div><div style="font-size:12px;color:var(--text-light);letter-spacing:1px;margin-bottom:4px">整體財富轉化效率總分</div>
+    <div style="font-size:36px;font-weight:700;font-family:'Noto Serif TC',serif;color:var(--navy)">${total.toFixed(1)} <span style="font-size:16px;color:var(--text-light)">/ 10</span></div></div>
+    <div style="padding:12px 20px;border-radius:12px;background:${tc}20;border:2px solid ${tc};text-align:center">
+    <div style="font-size:11px;color:var(--text-light);letter-spacing:1px">整體評級</div>
+    <div style="font-size:18px;font-weight:700;color:${tc}">${getLevelLabel(getLevel(total))}</div></div></div>`;
 
-            4:[
-              '你已形成高品質人脈網絡與信任資本。',
-              '你的人際影響力已開始產生槓桿效應。',
-              '下一階段適合建立社群、圈層或平台型影響力。',
-              '你目前的人脈系統已具有高度價值流動能力。',
-              '接下來應聚焦長期聲望與影響力資產。'
-              ]
-           },
-        ability:{
-            1:[
-              '你的核心能力系統仍不穩定。',
-              '建議優先建立市場可辨識的專業技能。',
-              '請先聚焦單一核心能力的深度累積。',
-              '目前最重要的不是廣度，而是建立基礎競爭力。',
-              '建議先完成一項能被市場看見的成果。'
-              ],
-
-            2:[
-              '你已有基礎能力，但差異化仍不足。',
-              '建議增加作品輸出與跨領域整合。',
-              '建立可被市場看見的成果會非常重要。',
-              '你目前正處於能力累積到能力放大的關鍵階段。',
-              '下一步應聚焦建立個人優勢定位。'
-              ],
-
-            3:[
-              '你的能力已具有競爭力。',
-              '下一步是建立個人方法論與系統化能力。',
-              '可開始透過內容、教學或產品放大影響力。',
-              '你已具備一定程度的市場價值。',
-              '接下來應建立可複製與可擴張的能力結構。'
-              ],
-
-            4:[
-              '你的能力維度已接近高階專業者狀態。',
-              '你具備建立品牌、團隊或知識槓桿的潛力。',
-              '下一階段應聚焦長期影響力與可複製性。',
-              '你目前已具備高度專業與適應能力。',
-              '接下來應建立屬於自己的方法論與影響力系統。'
-              ]
-              }
-          };
-        
-      let level = 1;
-
-      if(score >= 8.5) level = 4;
-      else if(score >= 6.5) level = 3;
-      else if(score >= 4.5) level = 2;
-
-      return adviceMap[key][level];
-      };
-
-    let radarChart;
-
-    function generateReport(){
-      const scores = {
-        money: Number(calculateDimension('money')),
-        energy: Number(calculateDimension('energy')),
-        time: Number(calculateDimension('time')),
-        connections: Number(calculateDimension('connections')),
-        ability: Number(calculateDimension('ability')),
-      };
-
-      document.getElementById('moneyScore').innerText = scores.money;
-      document.getElementById('energyScore').innerText = scores.energy;
-      document.getElementById('timeScore').innerText = scores.time;
-      document.getElementById('connectionScore').innerText = scores.connections;
-      document.getElementById('abilityScore').innerText = scores.ability;
-
-      const overall = (
-        (scores.money + scores.energy + scores.time + scores.connections + scores.ability) / 5
-      ).toFixed(1);
-
-      document.getElementById('miniOverall').innerText = overall;
-
-      document.getElementById('overallText').innerHTML = `
-        整體財富轉化效率：<strong>${overall} / 10</strong>
-      `;
-
-      const reportCards = document.getElementById('reportCards');
-      reportCards.innerHTML = '';
-
-      Object.keys(scores).forEach(key => {
-        const card = document.createElement('div');
-        card.className = 'report-card';
-
-        card.innerHTML = `
-          <h3>${dimensions[key].title}</h3>
-          <p><strong>得分：</strong>${scores[key]} / 10</p>
-          <div class="status">${getLevel(scores[key])}</div>
-
-          <div style="margin-top:20px;">
-            <h4 style="margin-bottom:12px;">優先行動建議</h4>
-            <ul>
-              ${getAdvice(key,scores[key]).map(item => `<li>${item}</li>`).join('')}
-            </ul>
-          </div>
-        `;
-
-        reportCards.appendChild(card);
-      });
-
-      document.getElementById('reportSection').style.display = 'block';
-
-      const ctx = document.getElementById('radarChart');
-
-      if(radarChart){
-        radarChart.destroy();
-      }
-
-      radarChart = new Chart(ctx, {
-        type: 'radar',
-        data: {
-          labels: ['金錢','精力','時間','人脈','能力'],
-          datasets: [{
-            label: '五維財富評分',
-            data: [
-              scores.money,
-              scores.energy,
-              scores.time,
-              scores.connections,
-              scores.ability
-            ],
-            fill: true
-          }]
-        },
-        options: {
-          responsive: true,
-          scales: {
-            r: {
-              min: 0,
-              max: 10,
-              ticks: {
-                stepSize: 2
-              }
-            }
-          }
-        }
-      });
-
-      document.getElementById('radarChart').scrollIntoView({
-        behavior: 'smooth',
-        block: 'center'
-      });
-    }
-    const miniHeader = document.getElementById('miniHeader');
-
-    window.addEventListener('scroll', () => {
-
-      if(window.scrollY > 280){
-        miniHeader.classList.add('show');
-      } else {
-        miniHeader.classList.remove('show');
-      }
-
+  // Dim analysis
+  html+=`<div class="dim-analysis"><div style="padding-top:24px;padding-bottom:8px;font-family:'Noto Serif TC',serif;font-size:18px;font-weight:700;color:var(--navy)">各維度深度分析</div>`;
+  DIMS.forEach(d=>{
+    const sc=scores[d],lv=getLevel(sc),key=DIM_KEYS[d]+'_'+lv,data=TEXT_DB[key];
+    html+=`<div class="analysis-block"><div class="analysis-block-header ${HDR_CLS[d]}">
+      <div><div class="ab-title">${DIM_NAMES[d]} · ${DIM_EN[d]}</div><div class="ab-level">${data.level}</div></div>
+      <div class="ab-score">${sc.toFixed(1)} / 10</div></div>
+      <div class="analysis-body">
+      <p class="analysis-text1">${data.text1}</p>
+      <p class="analysis-text2">${data.text2}</p>
+      <div class="analysis-insight">${data.insight}</div>
+      <div class="sub-dims"><div class="sub-dim-title">子維度分析</div>`;
+    SUB_DIMS[d].forEach((name,si)=>{
+      const avg=parseFloat(subAvg(d,si)),pct=(avg/5)*100;
+      html+=`<div class="sub-dim-row"><div class="sub-dim-name">${name}</div>
+        <div class="sub-track"><div class="sub-fill" style="width:${pct}%;background:${SUB_COLOR[d]}"></div></div>
+        <div class="sub-score">${avg}</div></div>`;
     });
-  </script>
+    html+=`</div><div class="actions-title">本維度優先行動建議</div>`;
+    data.actions.forEach((a,ai)=>{
+      html+=`<div class="action-item"><div class="action-num">${ai+1}</div><div>${a}</div></div>`;
+    });
+    html+=`</div></div>`;
+  });
+  html+=`</div>`;
+
+  // 12-week plan
+  html+=`<div class="twelve-week"><div class="tw-title">12 週行動計劃框架</div>
+    <div class="tw-phase"><div class="tw-phase-num">第 1-4 週</div><div><div class="tw-phase-label">深度突破</div><div class="tw-phase-text">選擇得分最低的維度，每日執行一個具體行動，每晚記錄一個觀察。小改變、高一致性，建立動能比追求完美更重要。</div></div></div>
+    <div class="tw-phase"><div class="tw-phase-num">第 5-8 週</div><div><div class="tw-phase-label">資源轉化</div><div class="tw-phase-text">把最高分維度的資源有意識地投入到提升第二低分維度。每週識別一次「低維換高維」的決策機會，刻意選擇它。</div></div></div>
+    <div class="tw-phase"><div class="tw-phase-num">第 9-12 週</div><div><div class="tw-phase-label">系統整合</div><div class="tw-phase-text">把前8週的改變系統化。哪些新習慣要固定下來？完成第二輪評估，對比前後雷達圖，確認成長軌跡並設計下一季計劃。</div></div></div>
+    <div class="tw-mantra">每週問自己：「我這週正在用什麼換什麼？是低維換高維，還是高維換低維？」</div>
+  </div>`;
+
+  html+=`<div class="report-footer">五維財富動力學 · 個人深度分析報告 · 為個人保密文件</div>`;
+
+  document.getElementById('reportContent').innerHTML = html;
+  document.getElementById('reportOverlay').classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+
+function closeReport() {
+  document.getElementById('reportOverlay').classList.remove('open');
+  document.body.style.overflow = '';
+}
+function closeReportOnBg(e) {
+  if (e.target === document.getElementById('reportOverlay')) closeReport();
+}
+
+buildQuestions();
+</script>
 </body>
 </html>
